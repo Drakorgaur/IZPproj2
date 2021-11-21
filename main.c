@@ -1,36 +1,55 @@
 #include <stdio.h>
+#include "test.c"
+/*
+ * commented because defined in test.c
+ * when we go production - we uncomment & delete test.c
+ */
+//typedef unsigned short bool;
+//#define true 1
+//#define false 0
 
-int main(int argc, char** argv) {
-    printf("argc: %d\n", argc);
-    for (int i = 0; i < argc; i++) {
-        printf("%s\n", argv[i]);
-    }
-
-    int i = 0;
-    int rows = 1;
-    int columns = 1;
-    while (!feof(stdin))
+void operateWithFile(FILE *file, int* columns, int* rows, bool create, char** matrix)
+{
+    int column = 1;
+    int row = 1;
+    while (!feof(file))
     {
-        if (fgetc(stdin) != '\n') {
-            i++;
-        } else {
-            columns++;
-            if (i > rows) {
-                rows = i;
+        if (fgetc(file) != '\n') {
+            if (create) {
+                matrix[column][row] = (char)fgetc(file);
             }
-            i = 0;
+            row++;
+        } else {
+            column++;
+            if (row > *rows) {
+                *rows = row;
+            }
+            row = 0;
         }
     }
-    printf("\n\ncolumns = %d\nrows = %d\n", columns, rows);
-    int matrix[columns][rows];
-    int value = 0;
-    for (int column = 0; column < columns; column++) {
-        for (int row = 0; row < rows; row++) {
-            matrix[column][row] = value;
-            value++;
-            printf("%d\t", matrix[column][row]);
-        }
-        printf("\n");
-    }
+    *columns = column;
+}
+void createFileMatrix()
+{
+    /*
+     * init i, rows, columns to create matrix
+     */
+    int i = 1, rows = 0, columns = 1;
+    char **empty = NULL;
+    FILE *file = stdin;
+    operateWithFile(file, &columns, &rows, false, (char **) empty);
+    char matrix[columns][rows];
+    operateWithFile(file, &columns, &rows, true, (char **) matrix);
+    show_matrix(columns, rows, (char **) matrix);
+}
+int main(int argc, char** argv) {
+    /*
+     * func to print argc and argv[]
+     */
+    getArg(argc, argv);
+
+    test_active();
+    createFileMatrix();
+
     return 0;
 }
