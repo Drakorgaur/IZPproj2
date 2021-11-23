@@ -4,20 +4,36 @@
 #include "list.c"
 
 int main (void) {
-    int i = 1000;
     Array a;
-    initArray(&a, 8);
-//    a.array[0][0] = 's';
-//    printf("%c", a.array[0][0]);
-    for (int j = 0; j < i; j++) {
-        if (!(j % 50)) {
-            takeNewRow(&a);
+    initArray(&a, 3);
+//    int **p, N = 2, M = 5; // 2 rows, 5 columns
+//    //getNoReturn(&p, N, M);
+//    p = get(N, M);
+//    fill(p , N, M);
+//    print(p, N, M);
+//    free2Darray(p ,N);
+//    for (int i = 0; i < 8; i++) {
+//        insertValue(&a, 'c');
+//        printf("%c", a.array[0][i]);
+//    }
+//    printf("\n");
+//    takeNewRow(&a);
+//    for (int i = 0; i + 8 < 16; i++) {
+//        insertValue(&a, 's');
+//        printf("%c", a.array[1][i]);
+//    }
+//    printf("\n");
+//    for (int i = 0; i < 8; i++) {
+//        printf("%c", a.array[0][i]);
+//    }
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            insertValue(&a,  's');
+            printf("%c", a.array[i][j]);
         }
-        insertValueToArrayRow(&a, 's');
-    }
-    for (int q = 0; q < (int) a.row_used; q++) {
-        for (int sub_i = 0; q < (int) a.column_used; sub_i++) {
-            printf("%c ", a.array[q][sub_i]);
+        if (a.row_used == a.row_size) {
+            addRow(&a);
         }
         printf("\n");
     }
@@ -25,7 +41,6 @@ int main (void) {
     printf("\n");
     printf("%d", (int) a.row_used);
     printf("%d", (int) a.column_used);
-    printf("%c", a.array[5][2]);
     freeArray(&a);
     return 0;
 }
