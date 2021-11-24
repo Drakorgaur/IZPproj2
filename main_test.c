@@ -1,46 +1,78 @@
+#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include "list.c"
 
-int main (void) {
-    Array a;
-    initArray(&a, 3);
-//    int **p, N = 2, M = 5; // 2 rows, 5 columns
-//    //getNoReturn(&p, N, M);
-//    p = get(N, M);
-//    fill(p , N, M);
-//    print(p, N, M);
-//    free2Darray(p ,N);
-//    for (int i = 0; i < 8; i++) {
-//        insertValue(&a, 'c');
-//        printf("%c", a.array[0][i]);
-//    }
-//    printf("\n");
-//    takeNewRow(&a);
-//    for (int i = 0; i + 8 < 16; i++) {
-//        insertValue(&a, 's');
-//        printf("%c", a.array[1][i]);
-//    }
-//    printf("\n");
-//    for (int i = 0; i < 8; i++) {
-//        printf("%c", a.array[0][i]);
-//    }
+typedef struct {
+    char **array;
+    size_t column_size;
+    size_t column_used;
+    size_t row_size;
+    size_t row_used;
+} Array;
 
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            insertValue(&a,  's');
-            printf("%c", a.array[i][j]);
+void initArray(Array *a, size_t initialSize) {
+    a->array = (char **)malloc(initialSize * sizeof *(a->array));
+    if (a->array) {
+        for (int i = 0; i < initialSize; i++)
+            a->array[i] = (char*)malloc(initialSize * sizeof*(a->array[i]));
+//        a->column_used = a->row_used = 0;
+        a->column_used = a->row_used = a->column_size = a->row_size = initialSize;
+    }
+}
+
+void upgrade(Array *A)
+{
+    A->array = (char **)realloc(A->array, sizeof(char **)*A->row_size);
+
+    for(int i=0; i<A->row_used; ++i){
+        A->array[i] = (char *)realloc(A->array[i], sizeof(char)*A->row_size);
+    }
+
+    for(size_t i=A->row_used; i<A->row_size; ++i){
+        *(A->array+i) = (char *)malloc(sizeof(char)*A->row_size);
+    }
+
+}
+
+int main(int argc, char const *argv[]) {
+
+    int N = 10, M = 15, count = 0;
+    Array A;
+
+    initArray(&A, N);
+
+    for(int i=0; i<A.row_size; ++i){
+        for(int j=0; j<A.row_size; ++j){
+            A.array[i][j] = 'a';
         }
-        if (a.row_used == a.row_size) {
-            addRow(&a);
+    }
+
+    for(int i=0; i<A.row_size; ++i){
+        for(int j=0; j<A.row_size; ++j){
+            printf("%c ", A.array[i][j]);
         }
         printf("\n");
     }
-    printf("\n");
-    printf("\n");
-    printf("%d", (int) a.row_used);
-    printf("%d", (int) a.column_used);
-    freeArray(&a);
+    A.row_size += 3;
+
+    upgrade(&A);
+
+    for(size_t i=0; i<A.row_used; ++i){
+        for(size_t j=A.row_used; j<A.row_size; ++j){
+            A.array[i][j] = 'b';
+        }
+    }
+    for(size_t i=A.row_used; i<A.row_size; ++i){
+        for(size_t j=0; j<A.row_size; ++j){
+            A.array[i][j] = 'c';
+        }
+    }
+
+    for(size_t i=0; i<A.row_size; ++i){
+        for(size_t j=0; j<A.row_size; ++j){
+            printf("%c ", A.array[i][j]);
+        }
+        printf("\n");
+    }
+
     return 0;
 }
