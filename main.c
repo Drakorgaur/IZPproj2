@@ -10,6 +10,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+bool charValid(char value)
+{
+    if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || value == ' ' || value == ')'
+    || value == '(' )) return true;
+        return false;
+
+}
+
 void getArraySize(FILE* file, int *row, int *column) {
     int columns = 0, *p = &columns;
     while (!feof(file))
@@ -28,35 +36,25 @@ void getArraySize(FILE* file, int *row, int *column) {
 }
 
 void fillArray(FILE* file, char** matrix, int *row, int *column) {
-    matrix = (char**) malloc(sizeof (char *) * *row);
-    for (int i = 0; i < *column; i++) {
-        matrix[i] = (char*) malloc(sizeof (char) * *column);
+    matrix = (char**) malloc(sizeof (char *) * (*row + 1));
+    for (int i = 0; i < *row; i++) {
+        matrix[i] = (char*) malloc(sizeof (char) * (*column + 1));
     }
-//    int i = 0, j;
-//    while (!feof(file)) {
-//        char tmp;
-//        fscanf(file, "%c\n", &tmp);
-//        for (j = 0; j < *column; j++) {
-//            if (tmp == '\n'){
-//                i++;
-//                break;
-//            }
-//            matrix[i][j] = tmp;
-//        }
-//    }
     for (int i = 0; i < *row; i++) {
         for (int j = 0; j < *column; j++) {
+            printf(" %d[%d] = ", i, j);
             char tmp;
             tmp = fgetc(file);
-            if (tmp == '\n'){
-                printf("\n");
+            if (tmp == '\n') {
                 break;
             }
-            matrix[i][j] = tmp;
-            printf("%c", matrix[i][j]);
+            if (charValid(tmp)) {
+                matrix[i][j] = tmp;
+                printf("%c", matrix[i][j]);
+            }
         }
+        printf("\n");
     }
-
 }
 
 int main(int argc, char** argv)
@@ -65,19 +63,17 @@ int main(int argc, char** argv)
         printf("%s\n", argv[i]);
     }
     FILE* file = fopen(argv[1], "r");
-    char **matrix;
+    char **matrix = NULL;
     int column = 1;
     int row = 1;
     getArraySize(file, &row, &column);
     fclose(file);
-//    file = fopen(argv[1], "r");
-//    getArraySize(file, &row, &column);
     file = fopen(argv[1], "r");
     fillArray(file, matrix, &row, &column);
-    for (int i = 0; i < row; i++) {
-        free(matrix[i]);
-    }
+
+//    printf("---%c---", matrix[6][2]);
     free(matrix);
+
     fclose(file);
     printf("\n\n%d\n", row);
     printf("%d", column);
