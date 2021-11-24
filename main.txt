@@ -1,15 +1,4 @@
-U ias
-S 1234
-C 13456
-
-
-
-
-
-
-
-sf
-asfsd
-fs
-dgs
-dgsg
+U asd asda sda sda saasdasf
+S 1234asdfasd
+C 13456asdfasdf asdfasd fasdfas
+R (1 2) (3 5)

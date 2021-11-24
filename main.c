@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-bool charValid(char value)
+bool valueValid(char value)
 {
     if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || value == ' ' || value == ')'
     || value == '(' )) return true;
@@ -71,7 +71,6 @@ int main(int argc, char** argv)
     file = fopen(argv[1], "r");
     fillArray(file, matrix, &row, &column);
 
-//    printf("---%c---", matrix[6][2]);
     free(matrix);
 
     fclose(file);
