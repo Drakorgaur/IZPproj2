@@ -5,6 +5,9 @@
 typedef unsigned short bool;
 #define true 1
 #define false 0
+#define forRows for (int row = 0; row < A->row_size; row++)
+#define forLine for (int line = 0; line < A->column_size; line++)
+#define rel [x][x+1]
 
 typedef struct {
     char **array;
@@ -15,28 +18,46 @@ typedef struct {
 } Array;
 
 typedef struct {
-   char* str;
-   int size;
+   char* universum[31];
 } universum;
 
 typedef struct {
-    char* str;
+    /*
+     * TO DO: nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false + patřit do univerza
+     */
+    char* str[31];
+    int column_size;
+    int column_used;
+    int row_size;
+    int row_used;
+} set;
+
+typedef struct {
+    char* relation[31];
+    int column_size;
+    int column_used;
+    int row_size;
+    int row_used;
+} relation;
+
+typedef struct {
+    char** command;
+    int column_size;
+    int column_used;
+    int row_size;
+    int row_used;
 } commands;
 
 typedef struct {
-    char* relation_1;
-    char* relation_2;
-} relation;
+    commands* C;
+    relation* R;
+    set*      S;
+} type;
 
 bool valueValid(char value)
 {
     if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || value == ' ' || value == ')'
          || value == '(' ) || (value >= '0' && value <= '9')) return true;
-    return false;
-}
-
-bool checkLenght(char *str, int size) {
-    if (strlen(str) == size) return true;
     return false;
 }
 
@@ -82,7 +103,34 @@ void upgrade(Array *A)
         A->array[i][A->column_size-1] = ' ';
     }
 }
+//-------------Functions-For-Set-Relace-Universum----------------
 
+//void separate_element(char *str, Array *A) {
+//    forLine {
+//
+//    }
+//}
+bool checkSetElementsInUniversum(Array* A) {
+    int universum_row;
+    forRows {
+        if (A->array[row][0] == 'U') {
+            universum_row = row;
+        }
+    }
+    forRows {
+        if (A->array[row][0] == 'S' || A->array[row][0] == 'R') {
+            forLine {
+
+            }
+        }
+    }
+    return true;
+}
+
+//----------------------------------------------------------------
+/*
+ * TO DO: delete on prod
+ */
 void var_dump(Array* a) {
     for (int r = 0; r < a->row_size; r++) {
         printf("%d| ", r);
@@ -93,7 +141,11 @@ void var_dump(Array* a) {
     }
 }
 
-void clearSpace(Array *A) {
+void distributeElements() {
+
+}
+
+void clearSpace(Array* A) {
     for (int i = A->column_used; i < A->column_size; i++) {
         A->array[A->row_used][i] = ' ';
     }
@@ -142,8 +194,6 @@ bool checkLine(char* str, int size, Array* A) {
             exit(1);
         }
     }
-
-
     return true;
 }
 

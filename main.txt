@@ -1,8 +1,5 @@
-U asd asda
-S 1234asdfasd123
-C 2
-R (1 2) (3 5)
-U asd asda
-S 1234asdfasd
-C 12345678901
-R (1 2) (3 5)
+U dad mom girl boy man woman
+R (dad boy) (dad girl) (mom boy) (mom girl)
+R (dad man) (boy man) (mom woman) (girl woman)
+C codomain 2
+C function 3
