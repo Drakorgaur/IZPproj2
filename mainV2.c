@@ -8,7 +8,12 @@ typedef unsigned short bool;
 #define DEFAULT_SIZE 2
 #define MAX_SIZE 31
 #define forDefault for (int j = 0; j < DEFAULT_SIZE; j++)
-#define foreachType for (int i = 0; i < Type->elements_used; i++)
+#define foreachElementInType for (int i = 0; i < Type->elements_used; i++)
+#define SELECT_FROM_TYPES for (int i = 0; i < memory->used; i++) {
+#define WHERE for (int j = 0; j < TYPE[i]->elements_used; j++) {
+#define VALUE(a) if (TYPE[i]->value == (a)) {
+#define ROW(a) if (strcmp(TYPE[i]->row, (a)) == 0) {
+#define end }}}
 #define TYPE memory->Type
 
 typedef struct {
@@ -16,7 +21,7 @@ typedef struct {
      * TODO: nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false + patřit do univerza
      */
     char value;
-    char* row; //99999
+    char* row;
     int row_length;
     char** str;
     int elements_amount;
@@ -49,7 +54,7 @@ void var_dump(type *Type) {
     printf("Elements amount: %d\n", Type->elements_amount);
     printf("Elements used: %d\n", Type->elements_used);
     printf("Str: ");
-    foreachType {
+    foreachElementInType {
         printf("%s ", Type->str[i]);
     }
     printf("\n\n");
@@ -103,7 +108,16 @@ void resizeRow(type* T) {
     T->row = realloc(T->row, sizeof(char) * (T->row_length + 1));
     T->row_length++;
 }
+/*
+ * TODO: test for
+ *      1) 30 symbols
+ *      2) rows more than 9999
+ */
 
+/*
+ * TODO: create exit(1) for
+ *      1) No newline at EOF
+ */
 void readFromFile(char* fileName, Memory *memory) {
     FILE *file = fopen(fileName, "r");
     int line = 0, j = 0;
@@ -163,16 +177,32 @@ void freeMemory(Memory* memory) {
     free(memory);
 }
 
+void selectByValue(Memory* memory, char ch) {
+    SELECT_FROM_TYPES WHERE VALUE(ch)
+                var_dump(TYPE[i]);
+                break;
+            end
+}
+
+type* selectByRow(Memory* memory, char* line) {
+    SELECT_FROM_TYPES WHERE ROW(line)
+                return TYPE[i];
+            end
+    return NULL;
+}
 
 int main(int argc, char **argv) {
-    Memory *M = createMemory();
-    readFromFile(argv[1], M);
-    for (int i = 0; i < M->used; i++) var_dump(M->Type[i]);
+    (void)argc;
+    Memory *memory = createMemory();
+    readFromFile(argv[1], memory);
+    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
 
     char setFunc[10][10] = {"empty", "card", "complement", "union", "intersect", "minus", "subseteq", "subset",
                             "equals"};
-
-    freeMemory(M);
+    var_dump(selectByRow(memory, "11"));
+    freeMemory(memory);
     return 0;
 }
 
+
+// SELECT TYPE WHERE value = 'U'
