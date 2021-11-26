@@ -9,10 +9,6 @@ typedef unsigned short bool;
 #define MAX_SIZE 31
 #define forDefault for (int j = 0; j < DEFAULT_SIZE; j++)
 #define foreachType for (int i = 0; i < Type->elements_used; i++)
-#define C memory->Type
-#define S memory->Type
-#define R memory->Type
-#define U memory->Type
 #define TYPE memory->Type
 
 typedef struct {
@@ -107,12 +103,15 @@ void resizeStr(type* T) {
 void readFromFile(char* fileName, Memory *memory) {
     FILE *file = fopen(fileName, "r");
     int line = 0, j = 0;
+    bool newLineChecker = false;
     char* buffer = malloc(sizeof(char) * MAX_SIZE);
     for (int i = 0; !feof(file); i++) {
         char symbol = fgetc(file);
         if (symbol == ' ' || symbol == '\n') {
             i = 0;
             if (j == 0) {
+                if (newLineChecker && symbol == '\n') continue;
+                newLineChecker = false;
                 TYPE[line]->value = buffer[0];
                 strcpy(buffer, "");
                 j++;
@@ -125,6 +124,7 @@ void readFromFile(char* fileName, Memory *memory) {
         }
         if (symbol == '\n') {
             j = 0;
+            newLineChecker = true;
             if (++memory->used == memory->size) {
                 resizeMemory(memory);
             }
