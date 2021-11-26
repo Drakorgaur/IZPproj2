@@ -7,7 +7,8 @@ typedef unsigned short bool;
 #define false 0
 #define DEFAULT_SIZE 5
 #define MAX_SIZE 31
-#define forDefault for (int i = 0; i < DEFAULT_SIZE; i++)
+#define forDefault for (int j = 0; j < DEFAULT_SIZE; j++)
+#define foreachType for (int i = 0; i < Type->elements_used; i++)
 #define C memory->Type
 #define S memory->Type
 #define R memory->Type
@@ -35,8 +36,7 @@ typedef struct {
 
 bool valueValid(char value)
 {
-    if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || value == ')'
-         || value == '(' ) || (value >= '0' && value <= '9')) return true;
+    if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9'))) return true;
     return false;
 }
 
@@ -45,7 +45,7 @@ void var_dump(type *Type) {
     printf("Elements amount: %d\n", Type->elements_amount);
     printf("Elements used: %d\n", Type->elements_used);
     printf("Str: ");
-    for (int i = 0; i < Type->elements_used; i++) {
+    foreachType {
         printf("%s ", Type->str[i]);
     }
     printf("\n");
@@ -62,9 +62,7 @@ type** initTypeArray() {
         Type[i]->elements_used = 0;
         Type[i]->value = '@';
         Type[i]->str = malloc(sizeof(char*) * DEFAULT_SIZE);
-        for (int j = 0; j < DEFAULT_SIZE; j++) {
-            Type[i]->str[j] = malloc(sizeof(char) * MAX_SIZE);
-        }
+        forDefault Type[i]->str[j] = malloc(sizeof(char) * MAX_SIZE);
     }
     return Type;
 }
@@ -85,25 +83,19 @@ void addTypeObject(Memory* memory) {
     }
     memory->Type[memory->size]->elements_amount = 0;
     memory->Type[memory->size]->str = malloc(sizeof(char*) * DEFAULT_SIZE);
-    for (int j = 0; j < DEFAULT_SIZE; j++) {
-        memory->Type[memory->size]->str[j] = malloc(sizeof(char) * MAX_SIZE);
-    }
+    forDefault memory->Type[memory->size]->str[j] = malloc(sizeof(char) * MAX_SIZE);
     memory->size++;
 }
 
 void resizeMemory(Memory* memory) {
     memory->size++;
     memory->Type = realloc(memory->Type, sizeof(type*) * memory->size);
-    for (int i = memory->used; i < memory->size; i++) {
-        memory->Type[i] = malloc(sizeof(type));
-        memory->Type[i]->elements_amount = memory->size;
-        memory->Type[i]->elements_used = 0;
-        memory->Type[i]->value = '@';
-        memory->Type[i]->str = malloc(sizeof(char*) * memory->size);
-        for (int j = 0; j < memory->size; j++) {
-            memory->Type[i]->str[j] = malloc(sizeof(char) * MAX_SIZE);
-        }
-    }
+    memory->Type[memory->used] = malloc(sizeof(type));
+    memory->Type[memory->used]->elements_amount = DEFAULT_SIZE;
+    memory->Type[memory->used]->elements_used = 0;
+    memory->Type[memory->used]->value = '@';
+    memory->Type[memory->used]->str = (char **)malloc(sizeof(char *) * DEFAULT_SIZE);
+    forDefault memory->Type[memory->used]->str[j] = (char *)malloc(sizeof(char) * MAX_SIZE);
 }
 
 void resizeStr(type* T) {
@@ -114,22 +106,25 @@ void resizeStr(type* T) {
 
 void readFromFile(char* fileName, Memory *memory) {
     FILE *file = fopen(fileName, "r");
-    int line = 0;
-    int j = 0;
+    int line = 0, j = 0;
     char* buffer = malloc(sizeof(char) * MAX_SIZE);
     for (int i = 0; !feof(file); i++) {
         char symbol = fgetc(file);
         if (symbol == ' ' || symbol == '\n') {
-            j = 0;
             i = 0;
-            strcpy(TYPE[line]->str[TYPE[line]->elements_used], buffer);
-            strcpy(buffer, "");
-            TYPE[line]->elements_used++;
-            if (TYPE[line]->elements_used == TYPE[line]->elements_amount) {
-                resizeStr(TYPE[line]);
+            if (j == 0) {
+                TYPE[line]->value = buffer[0];
+                strcpy(buffer, "");
+                j++;
+            } else {
+                strcpy(TYPE[line]->str[TYPE[line]->elements_used], buffer);
+                strcpy(buffer, "");
+                TYPE[line]->elements_used++;
+                if (TYPE[line]->elements_used == TYPE[line]->elements_amount) resizeStr(TYPE[line]);
             }
         }
         if (symbol == '\n') {
+            j = 0;
             if (++memory->used == memory->size) {
                 resizeMemory(memory);
             }
@@ -141,7 +136,6 @@ void readFromFile(char* fileName, Memory *memory) {
         }
         if (valueValid(symbol)) {
             strncat(buffer, &symbol, 1);
-            j++;
         }
     }
     fclose(file);
@@ -149,7 +143,7 @@ void readFromFile(char* fileName, Memory *memory) {
 
 void freeMemory(Memory* memory) {
     for (int i = 0; i < memory->size; i++) {
-        for (int j = 0; j < memory->size - 1; j++) {
+        for (int j = 0; j < memory->Type[i]->elements_amount; j++) {
             free(memory->Type[i]->str[j]);
         }
         free(memory->Type[i]->str);
@@ -158,11 +152,11 @@ void freeMemory(Memory* memory) {
     free(memory);
 }
 
+
 int main(int argc, char **argv) {
-    Memory* M = createMemory();
+    Memory *M = createMemory();
     readFromFile(argv[1], M);
-//    resizeMemory(M);
-    for (int i = 0; i < M->size - 1; i++) {
+    for (int i = 0; i < M->size - 2; i++) {
         var_dump(M->Type[i]);
     }
     freeMemory(M);
