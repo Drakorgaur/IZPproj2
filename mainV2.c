@@ -38,9 +38,10 @@ typedef struct {
 } Memory;
 
 typedef struct {
-    int* lines;
-    char functions[10][10];
-} set;
+    char** array;
+    int size;
+    int used;
+} result;
 
 bool valueValid(char value)
 {
@@ -137,7 +138,7 @@ void readFromFile(char* fileName, Memory *memory) {
                     TYPE[line]->value = symbol;
                     continue;
                 }
-                TYPE[line]->value = buffer[0];
+                TYPE[line]->value = valueValid(buffer[0]) ? buffer[0] : 'U';
                 if (row > ((10 ^ TYPE[line]->row_length) - 1)) {
                     resizeRow(TYPE[line]);
                     TYPE[line]->row_length++;
@@ -177,11 +178,33 @@ void freeMemory(Memory* memory) {
     free(memory);
 }
 
-void selectByValue(Memory* memory, char ch) {
+void freeResult(result* res) {
+    for (int i = 0; i < res->used; i++) free(res->array[i]);
+    free(res->array);
+    free(res);
+}
+
+result* createResult() {
+    result* res = malloc(sizeof(result));
+    res->size = DEFAULT_SIZE;
+    res->used = 0;
+    res->array = malloc(sizeof(char*) * DEFAULT_SIZE);
+    forDefault res->array[j] = malloc(sizeof(char) * MAX_SIZE);
+    return res;
+}
+
+void resizeResult(result* res) {
+    res->size++;
+    res->array = realloc(res->array, sizeof(char*) * res->size);
+    res->array[res->used] = malloc(sizeof(char) * MAX_SIZE);
+}
+
+void selectByValue(Memory* memory, result* res, char ch) {
     SELECT_FROM_TYPES WHERE VALUE(ch)
-                var_dump(TYPE[i]);
-                break;
-            end
+    strcpy(res->array[res->used], TYPE[i]->row);
+    if (++res->used == res->size) resizeResult(res);
+    break;
+    end
 }
 
 type* selectByRow(Memory* memory, char* line) {
@@ -191,18 +214,56 @@ type* selectByRow(Memory* memory, char* line) {
     return NULL;
 }
 
+bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
+    char array[DEFAULT_SIZE] = {'R', 'S'};
+    result* universum = createResult();
+    selectByValue(memory, universum, 'U'); // in universum we have row for U
+    printf("%s\n", universum->array[0]);
+    type* Universum = selectByRow(memory, universum->array[universum->used - 1]); //in Universum we have elements of U
+    for (int i = 0; i < DEFAULT_SIZE; i++) {
+        result* Temp = createResult();
+        selectByValue(memory, Temp, array[i]);     // in T we have row for R or S
+        for (int j = 0; j < Temp->used; j++) {
+            type* R = selectByRow(memory, Temp->array[j]); // in R we have elements of R or S
+            for (int d = 0; d < R->elements_used; d++) {
+                bool found = false;
+                for (int k = 0; k < Universum->elements_used; k++) { //check for elements of R or S in Universum
+                    if (strcmp(R->str[d], Universum->str[k]) == 0) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    freeResult(universum);
+                    freeResult(Temp);
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 int main(int argc, char **argv) {
     (void)argc;
     Memory *memory = createMemory();
+    result* res = createResult();
     readFromFile(argv[1], memory);
-    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
-
+//    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
     char setFunc[10][10] = {"empty", "card", "complement", "union", "intersect", "minus", "subseteq", "subset",
                             "equals"};
-    var_dump(selectByRow(memory, "11"));
+//    var_dump(selectByRow(memory, "11"));
+
+    selectByValue(memory, res, 'C');
+    if (!checkForRelationAndSetElementsInUniversum(memory)) {
+        printf("ERROR: relation is not valid\n");
+        freeMemory(memory);
+        freeResult(res);
+        return 1;
+    }
+//    for (int i = 0; i < res->used; i++) var_dump(selectByRow(memory, res->array[i]));
+
     freeMemory(memory);
+    freeResult(res);
     return 0;
 }
-
-
-// SELECT TYPE WHERE value = 'U'
