@@ -179,6 +179,14 @@ void freeMemory(Memory* memory) {
     free(memory);
 }
 
+//create function to free() type
+void freeType(type* Type) {
+    for (int i = 0; i < Type->elements_amount; i++) free(Type->str[i]);
+    free(Type->str);
+    free(Type->row);
+    free(Type);
+}
+
 void freeResult(result* res) {
     for (int i = 0; i < res->used; i++) free(res->array[i]);
     free(res->array);
@@ -208,23 +216,40 @@ void selectByValue(Memory* memory, result* res, char ch) {
     end
 }
 
-type* selectByRow(Memory* memory, char* line) {
+//create function to copy type and return it
+void copyType(type* newType, type* oldType) {
+    newType->value = oldType->value;
+    newType->value = oldType->value;
+    newType->elements_amount = oldType->elements_amount;
+    newType->elements_used = oldType->elements_used;
+    newType->row_length = oldType->row_length;
+    newType->row = malloc(sizeof(char) * newType->row_length);
+    strcpy(newType->row, oldType->row);
+    newType->str = malloc(sizeof(char*) * newType->elements_amount);
+    for (int i = 0; i < newType->elements_amount; i++) {
+        newType->str[i] = malloc(sizeof(char) * MAX_SIZE);
+        strcpy(newType->str[i], oldType->str[i]);
+    }
+}
+
+void selectByRow(Memory* memory, type* newType, char* line) {
     SELECT_FROM_TYPES WHERE ROW(line)
-                return TYPE[i];
+                copyType(newType, TYPE[i]);
             end
-    return NULL;
 }
 
 bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     char array[DEFAULT_SIZE] = {'R', 'S'};
     result* universum = createResult();
     selectByValue(memory, universum, 'U'); // in universum we have row for U
-    type* Universum = selectByRow(memory, universum->array[universum->used - 1]); //in Universum we have elements of U
+    type* Universum = malloc(sizeof(type));
+    selectByRow(memory, Universum, universum->array[universum->used - 1]); //in Universum we have elements of U
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         result* Temp = createResult();
         selectByValue(memory, Temp, array[i]);     // in T we have row for R or S
         for (int j = 0; j < Temp->used; j++) {
-            type* R = selectByRow(memory, Temp->array[j]); // in R we have elements of R or S
+            type* R = malloc(sizeof(type));
+            selectByRow(memory, R, Temp->array[j]); // in R we have elements of R or S
             for (int d = 0; d < R->elements_used; d++) {
                 bool found = false;
                 for (int k = 0; k < Universum->elements_used; k++) { //check for elements of R or S in Universum
@@ -236,11 +261,17 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
                 if (!found) {
                     freeResult(universum);
                     freeResult(Temp);
+                    freeType(R);
+                    freeType(Universum);
                     return false;
                 }
             }
+            freeType(R);
         }
+        freeResult(Temp);
     }
+    freeResult(universum);
+    freeType(Universum);
     return true;
 }
 
