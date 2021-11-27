@@ -160,6 +160,7 @@ void readFromFile(char* fileName, Memory *memory) {
             line++;
         }
         if (i == MAX_SIZE) {
+            fclose(file);
             printf("ERROR: element couldn't have size more than 30\n");
             exit(1);
         }
@@ -201,9 +202,9 @@ void resizeResult(result* res) {
 
 void selectByValue(Memory* memory, result* res, char ch) {
     SELECT_FROM_TYPES WHERE VALUE(ch)
-    strcpy(res->array[res->used], TYPE[i]->row);
-    if (++res->used == res->size) resizeResult(res);
-    break;
+                strcpy(res->array[res->used], TYPE[i]->row);
+                if (++res->used == res->size) resizeResult(res);
+            break;
     end
 }
 
@@ -218,7 +219,6 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     char array[DEFAULT_SIZE] = {'R', 'S'};
     result* universum = createResult();
     selectByValue(memory, universum, 'U'); // in universum we have row for U
-    printf("%s\n", universum->array[0]);
     type* Universum = selectByRow(memory, universum->array[universum->used - 1]); //in Universum we have elements of U
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         result* Temp = createResult();
@@ -245,13 +245,10 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
 }
 
 int main(int argc, char **argv) {
-    (void)argc;
     Memory *memory = createMemory();
     result* res = createResult();
     readFromFile(argv[1], memory);
-//    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
-    char setFunc[10][10] = {"empty", "card", "complement", "union", "intersect", "minus", "subseteq", "subset",
-                            "equals"};
+    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
 //    var_dump(selectByRow(memory, "11"));
 
     selectByValue(memory, res, 'C');
