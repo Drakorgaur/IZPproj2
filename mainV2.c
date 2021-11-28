@@ -11,16 +11,17 @@ typedef unsigned short bool;
 #define foreachElementInType for (int i = 0; i < Type->elements_used; i++)
 #define SELECT_FROM_TYPES for (int i = 0; i < memory->used; i++) {
 #define WHERE for (int j = 0; j < TYPE[i]->elements_used; j++) {
-#define VALUE(a) if (TYPE[i]->value == (a)) {
+#define VALUE(a) if (TYPE[i]->header == (a)) {
 #define ROW(a) if (strcmp(TYPE[i]->row, (a)) == 0) {
 #define end }}}
 #define TYPE memory->Type
+#define EMPTY 'E'
 
 typedef struct {
     /*
      * TODO: nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false + patřit do univerza
      */
-    char value;
+    char header;
     char* row;
     int row_length;
     char** str;
@@ -43,6 +44,11 @@ typedef struct {
     int used;
 } result;
 
+bool headerValid(char header) {
+    if (header == 'U' || header == 'R' || header == 'C' || header == 'S') return true;
+    return false;
+}
+
 bool valueValid(char value)
 {
     if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9'))) return true;
@@ -50,7 +56,7 @@ bool valueValid(char value)
 }
 
 void var_dump(type *Type) {
-    printf("Type: %c\n", Type->value);
+    printf("Type: %c\n", Type->header);
     printf("Row: %s\n", Type->row);
     printf("Elements amount: %d\n", Type->elements_amount);
     printf("Elements used: %d\n", Type->elements_used);
@@ -69,7 +75,7 @@ type** initTypeArray() {
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         Type[i]->elements_amount = DEFAULT_SIZE;
         Type[i]->elements_used = 0;
-        Type[i]->value = 'U';
+        Type[i]->header = EMPTY;
         Type[i]->row = malloc(sizeof(char) * DEFAULT_SIZE);
         Type[i]->row_length = DEFAULT_SIZE;
         Type[i]->str = malloc(sizeof(char*) * DEFAULT_SIZE);
@@ -82,7 +88,7 @@ Memory* createMemory() {
     Memory* memory = malloc(sizeof(Memory));
     memory->Type = initTypeArray();
     memory->size = DEFAULT_SIZE;
-    memory->used = 1;
+    memory->used = 0;
     return memory;
 }
 
@@ -92,7 +98,7 @@ void resizeMemory(Memory* memory) {
     memory->Type[memory->used] = malloc(sizeof(type));
     memory->Type[memory->used]->elements_amount = DEFAULT_SIZE;
     memory->Type[memory->used]->elements_used = 0;
-    memory->Type[memory->used]->value = 'U';
+    memory->Type[memory->used]->header = EMPTY;
     memory->Type[memory->used]->row = malloc(sizeof(char) * DEFAULT_SIZE);
     memory->Type[memory->used]->row_length = DEFAULT_SIZE;
     memory->Type[memory->used]->str = (char **)malloc(sizeof(char *) * DEFAULT_SIZE);
@@ -135,14 +141,10 @@ void readFromFile(char* fileName, Memory *memory) {
                 }
                 newLineChecker = false;
                 if (symbol == 'U') {
-                    TYPE[line]->value = symbol;
+                    TYPE[line]->header = symbol;
                     continue;
                 }
-                TYPE[line]->value = valueValid(buffer[0]) ? buffer[0] : 'U';
-                if (row > ((10 ^ TYPE[line]->row_length) - 1)) {
-                    resizeRow(TYPE[line]);
-                    TYPE[line]->row_length++;
-                }
+                TYPE[line]->header = valueValid(buffer[0]) ? buffer[0] : 'U';
                 sprintf(TYPE[line]->row, "%d", row);
                 strcpy(buffer, "");
                 j++;
@@ -168,6 +170,82 @@ void readFromFile(char* fileName, Memory *memory) {
     }
     fclose(file);
 }
+
+
+void readFromFileV2(char* filename, Memory* memory) {
+    FILE* file = fopen(filename, "r");
+    int row  = 1;
+    bool headerChecker = true;
+    char symbol, *wordBuffer;
+    wordBuffer = malloc(sizeof(char) * MAX_SIZE);
+    strcpy(wordBuffer, "");
+    memory->used = -1;
+    for (int wordSize = 0; !feof(file); wordSize++) {
+        symbol = fgetc(file);
+        while (symbol == ' ' || symbol == '\n') {
+            if (symbol == ' ') {
+                if (headerChecker) {
+                    symbol = fgetc(file);
+                    headerChecker = false;
+                    continue;
+                }
+
+                strcpy(TYPE[memory->used]->str[TYPE[memory->used]->elements_used], wordBuffer);
+
+                if (strcmp(wordBuffer, "") != 0) {
+                    TYPE[memory->used]->elements_used++;
+                }
+                strcpy(wordBuffer, "");
+                if (TYPE[memory->used]->elements_used == TYPE[memory->used]->elements_amount) resizeStr(TYPE[memory->used]);
+                wordSize = 0;
+            }
+            if (symbol == '\n') {
+                row++;
+                wordSize = 0;
+                symbol = fgetc(file);
+
+                if (!headerChecker) {
+                    strcpy(TYPE[memory->used]->str[TYPE[memory->used]->elements_used], wordBuffer);
+                    if (strcmp(wordBuffer, "") != 0) {
+                        TYPE[memory->used]->elements_used++;
+                    }
+                    strcpy(wordBuffer, "");
+                    if (TYPE[memory->used]->elements_used == TYPE[memory->used]->elements_amount) resizeStr(TYPE[memory->used]);
+                }
+                headerChecker = true;
+                continue;
+            }
+            symbol = fgetc(file);
+        }
+        if (wordSize == MAX_SIZE) {
+            fclose(file);
+            free(wordBuffer);
+            printf("ERROR: element couldn't have size more than 30\n");
+            exit(1);
+        }
+        if (headerChecker) {
+            if (headerValid(symbol)) {
+                if (++memory->used == memory->size) resizeMemory(memory);
+                TYPE[memory->used]->header = symbol;
+                TYPE[memory->used]->row = malloc(sizeof(char) * 3);
+                sprintf(TYPE[memory->used]->row, "%d", row);
+                continue;
+            } else {
+                if(feof(file)) {
+                    continue;
+                }
+                free(wordBuffer);
+                fclose(file);
+                exit(1);
+            }
+        }
+        if (valueValid(symbol)) strncat(wordBuffer, &symbol, 1);
+        headerChecker = false;
+    }
+    memory->used++;
+    fclose(file); free(wordBuffer);
+}
+
 
 void freeMemory(Memory* memory) {
     for (int i = 0; i < memory->size; i++) {
@@ -212,14 +290,14 @@ void selectByValue(Memory* memory, result* res, char ch) {
     SELECT_FROM_TYPES WHERE VALUE(ch)
                 strcpy(res->array[res->used], TYPE[i]->row);
                 if (++res->used == res->size) resizeResult(res);
-            break;
+                break;
     end
 }
 
 //create function to copy type and return it
 void copyType(type* newType, type* oldType) {
-    newType->value = oldType->value;
-    newType->value = oldType->value;
+    newType->header = oldType->header;
+    newType->header = oldType->header;
     newType->elements_amount = oldType->elements_amount;
     newType->elements_used = oldType->elements_used;
     newType->row_length = oldType->row_length;
@@ -235,7 +313,7 @@ void copyType(type* newType, type* oldType) {
 void selectByRow(Memory* memory, type* newType, char* line) {
     SELECT_FROM_TYPES WHERE ROW(line)
                 copyType(newType, TYPE[i]);
-            end
+    end
 }
 
 bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
@@ -278,17 +356,17 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
 int main(int argc, char **argv) {
     Memory *memory = createMemory();
     result* res = createResult();
-    readFromFile(argv[1], memory);
+    readFromFileV2(argv[1], memory);
     for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
 //    var_dump(selectByRow(memory, "11"));
 
-    selectByValue(memory, res, 'C');
-    if (!checkForRelationAndSetElementsInUniversum(memory)) {
-        printf("ERROR: relation is not valid\n");
-        freeMemory(memory);
-        freeResult(res);
-        return 1;
-    }
+//    selectByValue(memory, res, 'C');
+//    if (!checkForRelationAndSetElementsInUniversum(memory)) {
+//        printf("ERROR: relation is not valid\n");
+//        freeMemory(memory);
+//        freeResult(res);
+//        return 1;
+//    }
 //    for (int i = 0; i < res->used; i++) var_dump(selectByRow(memory, res->array[i]));
 
     freeMemory(memory);

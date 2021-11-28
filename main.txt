@@ -1,14 +1,16 @@
 U dad mom girl boy man woman
-
-
+S
+S
 R (dad dad) (dad girl) (mom boy) (mom girl)
 
 
 S dad mom
 
-
-
 R (dad man) (boy man) (mom woman) (girl woman)
-C codomain 2
+C codomain
 C function 3
-C function 3 function 3 function 3 function 3
+C function 3 function 3 function 3 function
+
+
+
+
