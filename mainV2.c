@@ -550,6 +550,47 @@ void executeFunction(Memory* memory) {
     freeResult(commands);
 }
 
+bool emptySet(type* R1) {
+    for (int i = 0; i < R1->elements_used; i++) {
+        if (R1->elements_used == 0)
+            true;
+    }
+    return false;
+}
+
+bool reflexiveRelation(type* R1) {
+    int i = 0;
+    for (int r = 0; r < (R1->elements_used / 2); r++) {
+        if (R1->str[i] != R1->str[i++])
+            return false;
+        i++;
+    }
+    return true;
+}
+
+bool symmetricRelation(type *R1) {
+    for (int i = 0; i < (R1->elements_used / 2); i++) {
+        for (int j = 2; j < (R1->elements_used / 2); j++) {
+            if ((R1->str[i] != R1->str[j+=2]) && (R1->str[i+=1] != R1->str[j+=3])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool antisymmetricRelation(type* R1) {
+    bool check = false;
+    for (int i = 0; i < (R1->elements_used / 2); i++) {
+        for (int j = 2; j < (R1->elements_used / 2); j++) {
+            if ((R1->str[i] == R1->str[j+=2]) && (R1->str[i+=1] == R1->str[j+=3])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 int main(int argc, char **argv) {
     Memory *memory = createMemory();
     result* res = createResult();
