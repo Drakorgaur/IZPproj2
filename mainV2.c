@@ -61,20 +61,30 @@ bool typeIsValid(type* A) {
 }
 
 void var_dump(type *Type) {
+    printf("Type: %c\n", Type->header);
+    printf("Row: %s\n", Type->row);
+    printf("Elements amount: %d\n", Type->elements_amount);
+    printf("Elements used: %d\n", Type->elements_used);
+    printf("Str: ");
+    foreachElementInType {
+        printf("%s ", Type->str[i]);
+    }
+    printf("\n\n");
+}
+
+void dump(type *Type, int* cursor) {
+    for (int i = *cursor; i < atoi(Type->row); i++) {
+        printf("\n");
+    }
     if (Type->header != 'F') {
-        printf("Type: %c\n", Type->header);
-        printf("Row: %s\n", Type->row);
-        printf("Elements amount: %d\n", Type->elements_amount);
-        printf("Elements used: %d\n", Type->elements_used);
-        printf("Str: ");
+        printf("%c ", Type->header);
         foreachElementInType {
             printf("%s ", Type->str[i]);
         }
-        printf("\n\n");
     } else {
-        printf("Str: ");
-        printf("%s\n\n", Type->str[0]);
+        printf("%s", Type->str[0]);
     }
+    *cursor = atoi(Type->row);
 }
 
 type** initTypeArray() {
@@ -628,7 +638,8 @@ int main(int argc, char **argv) {
 //    var_dump(A);
 //    freeType(A);
 
-    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
+    int cursor = 1;
+    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 
     freeMemory(memory);
     freeResult(res);
