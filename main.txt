@@ -7,9 +7,9 @@ R (dad dad) (dad girl) (mom boy) (mom girl)
 S dad mom
 
 R (dad man) (boy man) (mom woman) (girl woman)
-C codomain 4
-C function 2
-C function 4 5 1
+C empty 4
+C card 2
+C function 4
 
 
 

@@ -44,27 +44,37 @@ typedef struct {
     int used;
 } result;
 
-bool headerValid(char header) {
+bool headerIsValid(char header) {
     if (header == 'U' || header == 'R' || header == 'C' || header == 'S') return true;
     return false;
 }
 
-bool valueValid(char value)
+bool valueIsValid(char value)
 {
     if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9'))) return true;
     return false;
 }
 
+bool typeIsValid(type* A) {
+    if (A->elements_used < 0) return false;
+    return true;
+}
+
 void var_dump(type *Type) {
-    printf("Type: %c\n", Type->header);
-    printf("Row: %s\n", Type->row);
-    printf("Elements amount: %d\n", Type->elements_amount);
-    printf("Elements used: %d\n", Type->elements_used);
-    printf("Str: ");
-    foreachElementInType {
-        printf("%s ", Type->str[i]);
+    if (Type->header != 'F') {
+        printf("Type: %c\n", Type->header);
+        printf("Row: %s\n", Type->row);
+        printf("Elements amount: %d\n", Type->elements_amount);
+        printf("Elements used: %d\n", Type->elements_used);
+        printf("Str: ");
+        foreachElementInType {
+            printf("%s ", Type->str[i]);
+        }
+        printf("\n\n");
+    } else {
+        printf("Str: ");
+        printf("%s\n\n", Type->str[0]);
     }
-    printf("\n\n");
 }
 
 type** initTypeArray() {
@@ -163,7 +173,7 @@ void readFromFileV2(char* filename, Memory* memory) {
             exit(1);
         }
         if (headerChecker) {
-            if (headerValid(symbol)) {
+            if (headerIsValid(symbol)) {
                 if (++memory->used == memory->size) resizeMemory(memory);
                 TYPE[memory->used]->header = symbol;
                 TYPE[memory->used]->row = malloc(sizeof(char) * 3);
@@ -178,7 +188,7 @@ void readFromFileV2(char* filename, Memory* memory) {
                 exit(1);
             }
         }
-        if (valueValid(symbol)) strncat(wordBuffer, &symbol, 1);
+        if (valueIsValid(symbol)) strncat(wordBuffer, &symbol, 1);
         headerChecker = false;
     }
     memory->used++;
@@ -195,7 +205,6 @@ void freeMemory(Memory* memory) {
     free(memory);
 }
 
-//create function to free() type
 void freeType(type* Type) {
     for (int i = 0; i < Type->elements_amount; i++) free(Type->str[i]);
     free(Type->str);
@@ -267,21 +276,23 @@ bool checkIfTypeStrEmpty(type* A) {
 
 bool empty(type* A) {
     if (A->elements_used == 0) return true;
-    return true;
+    return false;
 }
 
-void card(type* A) {
-    printf("%d\n", A->elements_used);
+char* card(type* A) {
+    int size = (A->elements_used / 10) + 1;
+    char str[size];
+    return itoa(A->elements_used, str, 10);
 }
 
-void complement(type* A) {
-
+char* complement(type* A, type* U) {
+    return "";
 }
 
 /*
  * TODO: test
  */
-void union_(type* A, type* B) {
+char* union_(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
         printf("%s ", A->str[i]);
     }
@@ -293,12 +304,13 @@ void union_(type* A, type* B) {
         }
         printf("%s ", B->str[j]);
     }
+    return "";
 }
 
 /*
  * TODO: test
  */
-void intersect(type* A, type* B) {
+char* intersect(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
@@ -307,12 +319,13 @@ void intersect(type* A, type* B) {
             }
         }
     }
+    return "";
 }
 
 /*
  * TODO: test
  */
-void minus(type* A, type* B) {
+char* minus(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
@@ -322,12 +335,13 @@ void minus(type* A, type* B) {
         }
         printf("%s ", A->str[i]);
     }
+    return "";
 }
 
 /*
  * TODO: test
  */
-bool subseteq(type* A, type* B) {
+char* subseteq(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
@@ -335,13 +349,13 @@ bool subseteq(type* A, type* B) {
             }
         }
     }
-    return true;
+    return "true";
 }
 
 /*
  * TODO: test
  */
-bool subset(type* A, type* B) {
+char* subset(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
@@ -349,13 +363,13 @@ bool subset(type* A, type* B) {
             }
         }
     }
-    return true;
+    return "true";
 }
 
 /*
  * TODO: test
  */
-bool equals(type* A, type* B) {
+char* equals(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
@@ -363,7 +377,7 @@ bool equals(type* A, type* B) {
             }
         }
     }
-    return true;
+    return "true";
 }
 
 /*
@@ -373,41 +387,41 @@ bool equals(type* A, type* B) {
 /*
  * TODO: test
  */
-bool reflexive(type* A) {
+char* reflexive(type* A) {
     for (int i = 0; i < A->elements_used; i++) {
         if (strcmp(A->str[i], A->str[i]) != 0) return false;
     }
-    return true;
+    return "true";
 }
 
 /*
  * TODO: test
  */
-bool symmetric(type* A) {
+char* symmetric(type* A) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < A->elements_used; j++) {
             if (strcmp(A->str[i], A->str[j]) != 0) return false;
         }
     }
-    return true;
+    return "true";
 }
 
 /*
  * TODO: test
  */
-bool antisymmetric(type* A) {
+char* antisymmetric(type* A) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < A->elements_used; j++) {
             if (strcmp(A->str[i], A->str[j]) == 0 && i != j) return false;
         }
     }
-    return true;
+    return "true";
 }
 
 /*
  * TODO: test
  */
-bool transitive(type* A) {
+char* transitive(type* A) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < A->elements_used; j++) {
             for (int k = 0; k < A->elements_used; k++) {
@@ -415,42 +429,42 @@ bool transitive(type* A) {
             }
         }
     }
-    return true;
+    return "true";
 }
 
 /*
  * TODO: test
  */
-bool function(type* A) {
-    return false;
+char* function(type* A) {
+    return "blabla";
 }
 
 /*
  * TODO: test
  */
-bool domain(type* A) {
-    return false;
+char* domain(type* A) {
+    return "false";
 }
 
 /*
  * TODO: test
  */
-bool injective(type* A) {
-    return false;
+char* injective(type* C, type* A, type* B) {
+    return "false";
 }
 
 /*
  * TODO: test
  */
-bool surjective(type* A) {
-    return false;
+char* surjective(type* C, type* A, type* B) {
+    return "false";
 }
 
 /*
  * TODO: test
  */
-bool bijective(type* A) {
-    return false;
+char* bijective(type* C, type* A, type* B) {
+    return "false";
 }
 
 bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
@@ -490,19 +504,47 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     return true;
 }
 
-void callFunctionByItName(char* name, Memory* executors) {
-    printf("%s\n\n", name);
-    for (int i = 0; i < executors->used; i++) {
-        var_dump(executors->Type[i]);
+#define A 0
+#define B 1
+#define C 2
+char* callFunctionByItName(char* name, Memory* executors, type* U) {
+    if (strcmp(name, "empty") == 0) {
+        if (empty(executors->Type[A])) { return "true"; } else { return "false"; }
     }
+    if (strcmp(name, "card") == 0) return card(executors->Type[A]);
+    if (strcmp(name, "complement") == 0) return complement(executors->Type[A], U);
+    if (strcmp(name, "union") == 0) return union_(executors->Type[A], executors->Type[B]);
+    if (strcmp(name, "intersect") == 0) return intersect(executors->Type[A], executors->Type[B]);
+    if (strcmp(name, "minus") == 0) return minus(executors->Type[A], executors->Type[B]);
+    if (strcmp(name, "subseteq") == 0) return subseteq(executors->Type[A], executors->Type[B]);
+    if (strcmp(name, "subset") == 0) return subset(executors->Type[A], executors->Type[B]);
+    if (strcmp(name, "equals") == 0) return equals(executors->Type[A], executors->Type[B]);
+
+    if (strcmp(name, "reflexive") == 0) return reflexive(executors->Type[A]);
+    if (strcmp(name, "symmetric") == 0) return symmetric(executors->Type[A]);
+    if (strcmp(name, "antisymmetric") == 0) return antisymmetric(executors->Type[A]);
+    if (strcmp(name, "transitive") == 0) return transitive(executors->Type[A]);
+    if (strcmp(name, "function") == 0) return function(executors->Type[A]);
+    if (strcmp(name, "domain") == 0) return domain(executors->Type[A]);
+    if (strcmp(name, "injective") == 0) return injective(executors->Type[A], executors->Type[B], executors->Type[C]);
+    if (strcmp(name, "surjective") == 0) return surjective(executors->Type[A], executors->Type[B], executors->Type[C]);
+    if (strcmp(name, "bijective") == 0) return bijective(executors->Type[A], executors->Type[B], executors->Type[C]);
+    return "UNEXPECTED ERROR OCCURRED";
 }
 
-bool typeIsValid(type* A) {
-    if (A->elements_used < 0) return false;
-    return true;
+int getMaxLength(Memory* memory) {
+    int max = 0;
+    for (int i = 0; i < memory->used; i++) {
+        if (memory->Type[i]->elements_used > max) {
+            max = memory->Type[i]->elements_used;
+        }
+    }
+    return max;
 }
 
 void executeFunction(Memory* memory) {
+    int size = getMaxLength(memory);
+
     result* commands = createResult();
 
     selectByValue(memory, commands, 'C');
@@ -512,7 +554,6 @@ void executeFunction(Memory* memory) {
         executive->size = DEFAULT_SIZE;
         executive->used = 0;
         executive->Type = malloc(sizeof(type) * DEFAULT_SIZE);
-
 
         type* command = malloc(sizeof(type));
         selectByRow(memory, command, commands->array[i]);
@@ -541,7 +582,25 @@ void executeFunction(Memory* memory) {
             continue;
         }
 
-        callFunctionByItName(command->str[0], executive);
+        result* Universum = createResult();
+        selectByValue(memory, Universum, 'U');
+        type* U = malloc(sizeof(type));
+        selectByRow(memory, U, Universum->array[0]);
+
+        char* str = malloc(sizeof(char) * (size * MAX_SIZE));
+        str = callFunctionByItName(command->str[0], executive, U);
+        for (int j = 0; j < memory->used; j++) {
+            if (strcmp(memory->Type[j]->row, commands->array[i]) == 0) {
+                memory->Type[j]->header = 'F';
+                for (int k = 0; k < memory->Type[j]->elements_amount; k++) {
+                    memory->Type[j]->str[k] = realloc(memory->Type[j]->str[k], sizeof(char*) * size * MAX_SIZE);
+                }
+                strcpy(memory->Type[j]->str[0], str);
+            }
+        }
+
+        freeType(U);
+        freeResult(Universum);
         freeType(command);
         freeMemory(executive);
     }
@@ -554,7 +613,6 @@ int main(int argc, char **argv) {
     Memory *memory = createMemory();
     result* res = createResult();
     readFromFileV2(argv[1], memory);
-//    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
 
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
 //        printf("ERROR: relation is not valid\n");
@@ -569,6 +627,8 @@ int main(int argc, char **argv) {
 //    selectByRow(memory, A, "2");
 //    var_dump(A);
 //    freeType(A);
+
+    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
 
     freeMemory(memory);
     freeResult(res);
