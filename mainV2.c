@@ -13,7 +13,6 @@ typedef unsigned short bool;
 #define SELECT_FROM_TYPES for (int i = 0; i < memory->used; i++) {
 #define WHERE for (int j = 0; j < TYPE[i]->elements_used; j++) {
 #define VALUE(a) if (TYPE[i]->header == (a)) {
-#define ROW(a) if (strcmp(TYPE[i]->row, (a)) == 0) {
 #define end }}}
 #define TYPE memory->Type
 #define EMPTY 'E'
@@ -112,67 +111,6 @@ void resizeStr(type* T) {
     T->elements_amount++;
 }
 
-void resizeRow(type* T) {
-    T->row = realloc(T->row, sizeof(char) * (T->row_length + 1));
-    T->row_length++;
-}
-/*
- * TODO: test for
- *      1) 30 symbols
- *      2) rows more than 9999
- */
-
-/*
- * TODO: create exit(1) for
- *      1) No newline at EOF
- */
-void readFromFile(char* fileName, Memory *memory) {
-    FILE *file = fopen(fileName, "r");
-    int line = 0, j = 0;
-    bool newLineChecker = false;
-    char* buffer = malloc(sizeof(char) * MAX_SIZE);
-    for (int i = 0, row = 1; !feof(file); i++) {
-        char symbol = fgetc(file);
-        if (symbol == ' ' || symbol == '\n' || symbol == 'U') {
-            i = 0;
-            if (j == 0) {
-                if (newLineChecker && symbol == '\n') {
-                    row++;
-                    continue;
-                }
-                newLineChecker = false;
-                if (symbol == 'U') {
-                    TYPE[line]->header = symbol;
-                    continue;
-                }
-                TYPE[line]->header = valueValid(buffer[0]) ? buffer[0] : 'U';
-                sprintf(TYPE[line]->row, "%d", row);
-                strcpy(buffer, "");
-                j++;
-            } else {
-                strcpy(TYPE[line]->str[TYPE[line]->elements_used], buffer);
-                strcpy(buffer, "");
-                TYPE[line]->elements_used++;
-                if (TYPE[line]->elements_used == TYPE[line]->elements_amount) resizeStr(TYPE[line]);
-            }
-        }
-        if (symbol == '\n') {
-            j = 0; row++;
-            newLineChecker = true;
-            if (++memory->used == memory->size) resizeMemory(memory);
-            line++;
-        }
-        if (i == MAX_SIZE) {
-            fclose(file);
-            printf("ERROR: element couldn't have size more than 30\n");
-            exit(1);
-        }
-        if (valueValid(symbol)) strncat(buffer, &symbol, 1);
-    }
-    fclose(file);
-}
-
-
 void readFromFileV2(char* filename, Memory* memory) {
     FILE* file = fopen(filename, "r");
     int row  = 1;
@@ -246,7 +184,6 @@ void readFromFileV2(char* filename, Memory* memory) {
     memory->used++;
     fclose(file); free(wordBuffer);
 }
-
 
 void freeMemory(Memory* memory) {
     for (int i = 0; i < memory->used; i++) {
@@ -328,20 +265,192 @@ bool checkIfTypeStrEmpty(type* A) {
     return true;
 }
 
-void minus(type* A, type* B) {
+bool empty(type* A) {
+    if (A->elements_used == 0) return true;
+    return true;
+}
+
+void card(type* A) {
+    printf("%d\n", A->elements_used);
+}
+
+void complement(type* A) {
+
+}
+
+/*
+ * TODO: test
+ */
+void union_(type* A, type* B) {
+    for (int i = 0; i < A->elements_used; i++) {
+        printf("%s ", A->str[i]);
+    }
+    for (int j = 0; j < B->elements_used; j++) {
+        for (int i = 0; i < A->elements_used; i++) {
+            if (strcmp(A->str[i], B->str[j]) == 0) {
+                break;
+            }
+        }
+        printf("%s ", B->str[j]);
+    }
+}
+
+/*
+ * TODO: test
+ */
+void intersect(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
-                A->str[i][0] = '\0';
+                printf("%s ", A->str[i]);
                 break;
             }
         }
     }
 }
 
-bool empty(type* A) {
-    if (A->elements_used == 0) return true;
+/*
+ * TODO: test
+ */
+void minus(type* A, type* B) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < B->elements_used; j++) {
+            if (strcmp(A->str[i], B->str[j]) == 0) {
+                strcpy(A->str[i], "");
+                break;
+            }
+        }
+        printf("%s ", A->str[i]);
+    }
+}
+
+/*
+ * TODO: test
+ */
+bool subseteq(type* A, type* B) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < B->elements_used; j++) {
+            if (strcmp(A->str[i], B->str[j]) == 0) {
+                break;
+            }
+        }
+    }
     return true;
+}
+
+/*
+ * TODO: test
+ */
+bool subset(type* A, type* B) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < B->elements_used; j++) {
+            if (strcmp(A->str[i], B->str[j]) == 0) {
+                break;
+            }
+        }
+    }
+    return true;
+}
+
+/*
+ * TODO: test
+ */
+bool equals(type* A, type* B) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < B->elements_used; j++) {
+            if (strcmp(A->str[i], B->str[j]) == 0) {
+                break;
+            }
+        }
+    }
+    return true;
+}
+
+/*
+ * -------------------RELATIONS-------------------
+ */
+
+/*
+ * TODO: test
+ */
+bool reflexive(type* A) {
+    for (int i = 0; i < A->elements_used; i++) {
+        if (strcmp(A->str[i], A->str[i]) != 0) return false;
+    }
+    return true;
+}
+
+/*
+ * TODO: test
+ */
+bool symmetric(type* A) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < A->elements_used; j++) {
+            if (strcmp(A->str[i], A->str[j]) != 0) return false;
+        }
+    }
+    return true;
+}
+
+/*
+ * TODO: test
+ */
+bool antisymmetric(type* A) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < A->elements_used; j++) {
+            if (strcmp(A->str[i], A->str[j]) == 0 && i != j) return false;
+        }
+    }
+    return true;
+}
+
+/*
+ * TODO: test
+ */
+bool transitive(type* A) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < A->elements_used; j++) {
+            for (int k = 0; k < A->elements_used; k++) {
+                if (strcmp(A->str[i], A->str[j]) == 0 && strcmp(A->str[j], A->str[k]) == 0 && i != j && j != k) return false;
+            }
+        }
+    }
+    return true;
+}
+
+/*
+ * TODO: test
+ */
+bool function(type* A) {
+    return false;
+}
+
+/*
+ * TODO: test
+ */
+bool domain(type* A) {
+    return false;
+}
+
+/*
+ * TODO: test
+ */
+bool injective(type* A) {
+    return false;
+}
+
+/*
+ * TODO: test
+ */
+bool surjective(type* A) {
+    return false;
+}
+
+/*
+ * TODO: test
+ */
+bool bijective(type* A) {
+    return false;
 }
 
 bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
