@@ -9,6 +9,7 @@ typedef unsigned short bool;
 #define MAX_SIZE 31
 #define forDefault for (int j = 0; j < DEFAULT_SIZE; j++)
 #define foreachElementInType for (int i = 0; i < Type->elements_used; i++)
+#define foreachResult for (int i = 0; i < commands->used; i++)
 #define SELECT_FROM_TYPES for (int i = 0; i < memory->used; i++) {
 #define WHERE for (int j = 0; j < TYPE[i]->elements_used; j++) {
 #define VALUE(a) if (TYPE[i]->header == (a)) {
@@ -77,7 +78,7 @@ type** initTypeArray() {
         Type[i]->elements_used = 0;
         Type[i]->header = EMPTY;
         Type[i]->row = malloc(sizeof(char) * DEFAULT_SIZE);
-        Type[i]->row_length = DEFAULT_SIZE;
+        Type[i]->row_length = DEFAULT_SIZE + 1;
         Type[i]->str = malloc(sizeof(char*) * DEFAULT_SIZE);
         forDefault Type[i]->str[j] = malloc(sizeof(char) * MAX_SIZE);
     }
@@ -100,7 +101,7 @@ void resizeMemory(Memory* memory) {
     memory->Type[memory->used]->elements_used = 0;
     memory->Type[memory->used]->header = EMPTY;
     memory->Type[memory->used]->row = malloc(sizeof(char) * DEFAULT_SIZE);
-    memory->Type[memory->used]->row_length = DEFAULT_SIZE;
+    memory->Type[memory->used]->row_length = DEFAULT_SIZE + 1;
     memory->Type[memory->used]->str = (char **)malloc(sizeof(char *) * DEFAULT_SIZE);
     forDefault memory->Type[memory->used]->str[j] = (char *)malloc(sizeof(char) * MAX_SIZE);
 }
@@ -248,7 +249,7 @@ void readFromFileV2(char* filename, Memory* memory) {
 
 
 void freeMemory(Memory* memory) {
-    for (int i = 0; i < memory->size; i++) {
+    for (int i = 0; i < memory->used; i++) {
         for (int j = 0; j < memory->Type[i]->elements_amount; j++) free(memory->Type[i]->str[j]);
         free(memory->Type[i]->str);
         free(memory->Type[i]->row);
@@ -297,11 +298,10 @@ void selectByValue(Memory* memory, result* res, char ch) {
 //create function to copy type and return it
 void copyType(type* newType, type* oldType) {
     newType->header = oldType->header;
-    newType->header = oldType->header;
     newType->elements_amount = oldType->elements_amount;
     newType->elements_used = oldType->elements_used;
     newType->row_length = oldType->row_length;
-    newType->row = malloc(sizeof(char) * newType->row_length);
+    newType->row = malloc(sizeof(char) * newType->row_length + 1);
     strcpy(newType->row, oldType->row);
     newType->str = malloc(sizeof(char*) * newType->elements_amount);
     for (int i = 0; i < newType->elements_amount; i++) {
@@ -311,9 +311,37 @@ void copyType(type* newType, type* oldType) {
 }
 
 void selectByRow(Memory* memory, type* newType, char* line) {
-    SELECT_FROM_TYPES WHERE ROW(line)
-                copyType(newType, TYPE[i]);
-    end
+//    SELECT_FROM_TYPES ROW(line)
+//                copyType(newType, TYPE[i]);
+//    end
+    for (int i = 0; i < memory->used; i++) {
+        if (strcmp(memory->Type[i]->row, line) == 0) {
+            copyType(newType, TYPE[i]);
+        }
+    }
+}
+
+bool checkIfTypeStrEmpty(type* A) {
+    for (int i = 0; i < A->elements_amount; i++) {
+        if (strcmp(A->str[i], "") != 0) return false;
+    }
+    return true;
+}
+
+void minus(type* A, type* B) {
+    for (int i = 0; i < A->elements_used; i++) {
+        for (int j = 0; j < B->elements_used; j++) {
+            if (strcmp(A->str[i], B->str[j]) == 0) {
+                A->str[i][0] = '\0';
+                break;
+            }
+        }
+    }
+}
+
+bool empty(type* A) {
+    if (A->elements_used == 0) return true;
+    return true;
 }
 
 bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
@@ -353,23 +381,88 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     return true;
 }
 
+void callFunctionByItName(char* name, Memory* executors) {
+    printf("%s\n\n", name);
+    for (int i = 0; i < executors->used; i++) {
+        var_dump(executors->Type[i]);
+    }
+}
+
+bool typeIsValid(type* A) {
+    if (A->elements_used < 0) return false;
+    return true;
+}
+
+void executeFunction(Memory* memory) {
+    result* commands = createResult();
+
+    selectByValue(memory, commands, 'C');
+    foreachResult {
+        bool commandIsValid = true;
+        Memory* executive = malloc(sizeof(Memory));
+        executive->size = DEFAULT_SIZE;
+        executive->used = 0;
+        executive->Type = malloc(sizeof(type) * DEFAULT_SIZE);
+
+
+        type* command = malloc(sizeof(type));
+        selectByRow(memory, command, commands->array[i]);
+        printf("for command on %s row\n\n", command->row);
+        for (int element = 1; element < command->elements_used; element++) {
+            type* Type = malloc(sizeof(type));
+            selectByRow(memory, Type, command->str[element]);
+            if (!typeIsValid(Type)) {
+                printf("[ERROR] while executing command on %s row\nSet / Relation / Universum are blank or do "
+                       "not exist\n\n", command->row);
+                free(Type);
+                commandIsValid = false;
+                break;
+            }
+            executive->Type[executive->used] = malloc(sizeof(type));
+            copyType(executive->Type[executive->used], Type);
+            if (++executive->used == executive->size) {
+                executive->size++;
+                executive->Type = realloc(executive->Type, sizeof(type*) * executive->size);
+            }
+            freeType(Type);
+        }
+        if (!commandIsValid) {
+            freeType(command);
+            freeMemory(executive);
+            continue;
+        }
+
+        callFunctionByItName(command->str[0], executive);
+        freeType(command);
+        freeMemory(executive);
+    }
+
+
+    freeResult(commands);
+}
+
 int main(int argc, char **argv) {
     Memory *memory = createMemory();
     result* res = createResult();
     readFromFileV2(argv[1], memory);
-    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
-//    var_dump(selectByRow(memory, "11"));
+//    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
 
-//    selectByValue(memory, res, 'C');
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
 //        printf("ERROR: relation is not valid\n");
 //        freeMemory(memory);
 //        freeResult(res);
 //        return 1;
 //    }
-//    for (int i = 0; i < res->used; i++) var_dump(selectByRow(memory, res->array[i]));
+
+    executeFunction(memory);
+
+//    type* A= malloc(sizeof(type));
+//    selectByRow(memory, A, "2");
+//    var_dump(A);
+//    freeType(A);
 
     freeMemory(memory);
     freeResult(res);
     return 0;
+
 }
