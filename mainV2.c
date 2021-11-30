@@ -105,10 +105,7 @@ type** initTypeArray() {
     type** Type = malloc(sizeof(type*) * DEFAULT_SIZE);
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         Type[i] = malloc(sizeof(type));
-    }
-    for (int i = 0; i < DEFAULT_SIZE; i++) {
         createType(Type[i]);
-        forDefault Type[i]->str[j] = malloc(sizeof(char) * MAX_SIZE);
     }
     return Type;
 }
