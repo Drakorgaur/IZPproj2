@@ -93,7 +93,7 @@ void createType(type* T) {
     T->header = 'N'; //NONE or NULL
     T->row = malloc(sizeof(char) * DEFAULT_SIZE);
     T->row_length = 0;
-    T->str = malloc(sizeof(char) * DEFAULT_SIZE);
+    T->str = malloc(sizeof(char*) * DEFAULT_SIZE);
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         T->str[i] = malloc(sizeof(char) * MAX_SIZE);
     }
@@ -216,7 +216,6 @@ void freeType(type* Type) {
         free(Type->str[i]);
     }
     free(Type->row);
-    Type->str = NULL;
     free(Type->str);
     free(Type);
 }
