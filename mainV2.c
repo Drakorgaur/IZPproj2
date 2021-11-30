@@ -94,6 +94,9 @@ void createType(type* T) {
     T->row = malloc(sizeof(char) * DEFAULT_SIZE);
     T->row_length = 0;
     T->str = malloc(sizeof(char) * DEFAULT_SIZE);
+    for (int i = 0; i < DEFAULT_SIZE; i++) {
+        T->str[i] = malloc(sizeof(char) * MAX_SIZE);
+    }
     T->elements_amount = DEFAULT_SIZE;
     T->elements_used = 0;
 }
@@ -212,17 +215,18 @@ void readFromFileV2(char* filename, Memory* memory) {
 }
 
 void freeType(type* Type) {
-    for (int i = 0; i < Type->elements_amount; i++) free(Type->str[i]);
-    free(Type->str);
+    for (int i = 0; i < Type->elements_amount; i++) {
+        free(Type->str[i]);
+    }
     free(Type->row);
+    Type->str = NULL;
+    free(Type->str);
     free(Type);
 }
 
 void freeMemory(Memory* memory) {
-    for (int i = 0; i < memory->used; i++) {
-        for (int j = 0; j < memory->Type[i]->elements_amount; j++) freeType(memory->Type[i]);
-        free(memory->Type[i]->str);
-        free(memory->Type[i]->row);
+    for (int i = 0; i < memory->size; i++) {
+        freeType(memory->Type[i]);
     }
     free(memory->Type);
     free(memory);
