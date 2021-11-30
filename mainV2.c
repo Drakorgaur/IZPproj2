@@ -287,6 +287,9 @@ int card(type* A) {
 }
 
 char* complement(type* A, type* U) {
+    //get all elements of A that are not in U
+
+
     return "";
 }
 
@@ -509,29 +512,35 @@ char* callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     int A = 0;
     int B = 1;
     int C = 2;
-    if (strcmp(name, "empty") == 0) return empty(executors->Type[0]);
-    if (strcmp(name, "card") == 0) {
-        sprintf(str, "%d", card(executors->Type[0])); return str;
+    if (executors->used == 1) {
+        if (strcmp(name, "empty") == 0) return empty(executors->Type[0]);
+        if (strcmp(name, "card") == 0) {
+            sprintf(str, "%d", card(executors->Type[0])); return str;
+        }
+        if (strcmp(name, "complement") == 0) return complement(executors->Type[A], U);
+        if (strcmp(name, "reflexive") == 0) return reflexive(executors->Type[A]);
+        if (strcmp(name, "symmetric") == 0) return symmetric(executors->Type[A]);
+        if (strcmp(name, "antisymmetric") == 0) return antisymmetric(executors->Type[A]);
+        if (strcmp(name, "transitive") == 0) return transitive(executors->Type[A]);
+        if (strcmp(name, "function") == 0) return function(executors->Type[A]);
+        if (strcmp(name, "domain") == 0) return domain(executors->Type[A]);
     }
-    if (strcmp(name, "complement") == 0) return complement(executors->Type[A], U);
-    if (strcmp(name, "union") == 0) return union_(executors->Type[A], executors->Type[B]);
-    if (strcmp(name, "intersect") == 0) return intersect(executors->Type[A], executors->Type[B]);
-    if (strcmp(name, "minus") == 0) return minus(executors->Type[A], executors->Type[B]);
-    if (strcmp(name, "subseteq") == 0) return subseteq(executors->Type[A], executors->Type[B]);
-    if (strcmp(name, "subset") == 0) return subset(executors->Type[A], executors->Type[B]);
-    if (strcmp(name, "equals") == 0) return equals(executors->Type[A], executors->Type[B]);
 
-    if (strcmp(name, "reflexive") == 0) return reflexive(executors->Type[A]);
-    if (strcmp(name, "symmetric") == 0) return symmetric(executors->Type[A]);
-    if (strcmp(name, "antisymmetric") == 0) return antisymmetric(executors->Type[A]);
-    if (strcmp(name, "transitive") == 0) return transitive(executors->Type[A]);
-    if (strcmp(name, "function") == 0) return function(executors->Type[A]);
-    if (strcmp(name, "domain") == 0) return domain(executors->Type[A]);
-    if (strcmp(name, "injective") == 0) return injective(executors->Type[A], executors->Type[B], executors->Type[C]);
-    if (strcmp(name, "surjective") == 0) return surjective(executors->Type[A], executors->Type[B], executors->Type[C]);
-    if (strcmp(name, "bijective") == 0) return bijective(executors->Type[A], executors->Type[B], executors->Type[C]);
-    return "UNEXPECTED ERROR OCCURRED";
-    return "UNEXPECTED ERROR OCCURRED";
+    if (executors->used == 2) {
+        if (strcmp(name, "union") == 0) return union_(executors->Type[A], executors->Type[B]);
+        if (strcmp(name, "intersect") == 0) return intersect(executors->Type[A], executors->Type[B]);
+        if (strcmp(name, "minus") == 0) return minus(executors->Type[A], executors->Type[B]);
+        if (strcmp(name, "subseteq") == 0) return subseteq(executors->Type[A], executors->Type[B]);
+        if (strcmp(name, "subset") == 0) return subset(executors->Type[A], executors->Type[B]);
+        if (strcmp(name, "equals") == 0) return equals(executors->Type[A], executors->Type[B]);
+    }
+
+    if (executors->used == 3) {
+        if (strcmp(name, "injective") == 0) return injective(executors->Type[A], executors->Type[B], executors->Type[C]);
+        if (strcmp(name, "surjective") == 0) return surjective(executors->Type[A], executors->Type[B], executors->Type[C]);
+        if (strcmp(name, "bijective") == 0) return bijective(executors->Type[A], executors->Type[B], executors->Type[C]);
+    }
+    return "Error: not right function atributes";
 }
 
 int getMaxLength(Memory* memory) {

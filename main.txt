@@ -9,7 +9,7 @@ S dad mom
 
 R (dad man) (boy man) (mom woman) (girl woman)
 
-C empty 2
+C empty 2 3
 
 C card 4
 
