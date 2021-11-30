@@ -277,15 +277,13 @@ bool checkIfTypeStrEmpty(type* A) {
     return true;
 }
 
-bool empty(type* A) {
-    if (A->elements_used == 0) return true;
-    return false;
+char* empty(type* A) {
+    if (A->elements_used == 0) return "true";
+    return "false";
 }
 
-char* card(type* A) {
-    char* str = malloc(sizeof(char) * MAX_SIZE);
-    sprintf(str, "%d", A->elements_used);
-    return str;
+int card(type* A) {
+    return A->elements_used;
 }
 
 char* complement(type* A, type* U) {
@@ -507,14 +505,14 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     return true;
 }
 
-char* callFunctionByItName(char* name, Memory* executors, type* U) {
+char* callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     int A = 0;
     int B = 1;
     int C = 2;
-    if (strcmp(name, "empty") == 0) {
-        if (empty(executors->Type[0])) { return "true"; } else { return "false"; }
+    if (strcmp(name, "empty") == 0) return empty(executors->Type[0]);
+    if (strcmp(name, "card") == 0) {
+        sprintf(str, "%d", card(executors->Type[0])); return str;
     }
-    if (strcmp(name, "card") == 0) return card(executors->Type[A]);
     if (strcmp(name, "complement") == 0) return complement(executors->Type[A], U);
     if (strcmp(name, "union") == 0) return union_(executors->Type[A], executors->Type[B]);
     if (strcmp(name, "intersect") == 0) return intersect(executors->Type[A], executors->Type[B]);
@@ -532,6 +530,7 @@ char* callFunctionByItName(char* name, Memory* executors, type* U) {
     if (strcmp(name, "injective") == 0) return injective(executors->Type[A], executors->Type[B], executors->Type[C]);
     if (strcmp(name, "surjective") == 0) return surjective(executors->Type[A], executors->Type[B], executors->Type[C]);
     if (strcmp(name, "bijective") == 0) return bijective(executors->Type[A], executors->Type[B], executors->Type[C]);
+    return "UNEXPECTED ERROR OCCURRED";
     return "UNEXPECTED ERROR OCCURRED";
 }
 
@@ -592,7 +591,7 @@ void executeFunction(Memory* memory) {
         type* U = malloc(sizeof(type));
         selectByRow(memory, U, Universum->array[0]);
         char* str = malloc(sizeof(char) * (size * MAX_SIZE));
-        strcpy(str, callFunctionByItName(command->str[0], executive, U));
+        strcpy(str, callFunctionByItName(command->str[0], executive, U, str));
         for (int j = 0; j < memory->used; j++) {
             if (strcmp(memory->Type[j]->row, commands->array[i]) == 0) {
                 memory->Type[j]->header = 'F';
