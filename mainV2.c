@@ -615,12 +615,6 @@ int main(int argc, char **argv) {
     Memory *memory = createMemory();
 
     result* res = createResult();
-//    memory->used = 2;
-//    resizeMemory(memory);
-//    var_dump(memory->Type[0]);
-//    var_dump(memory->Type[1]);
-//    var_dump(memory->Type[2]);
-//    resizeStr(memory->Type[0]);
 
     readFromFileV2(argv[1], memory);
 
@@ -631,14 +625,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-//    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
     executeFunction(memory);
-
-//    type* A= malloc(sizeof(type));
-//    createType(A);
-//    selectByRow(memory, A, "2");
-//    var_dump(A);
-//    freeType(A);
 
     int cursor = 1;
     for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
