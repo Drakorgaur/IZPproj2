@@ -631,7 +631,8 @@ void executeFunction(Memory* memory) {
 }
 
 int main(int argc, char **argv) {
-//    Memory *memory = createMemory();
+    (void)argc;
+    Memory *memory = createMemory();
 //    result* res = createResult();
 //    readFromFileV2(argv[1], memory);
 
@@ -644,17 +645,17 @@ int main(int argc, char **argv) {
 
 //    executeFunction(memory);
 
-    type* A= malloc(sizeof(type));
-    createType(A);
+//    type* A= malloc(sizeof(type));
+//    createType(A);
 //    selectByRow(memory, A, "2");
 //    var_dump(A);
-    freeType(A);
+//    freeType(A);
 
 //    int cursor = 1;
 //    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 
 //    freeResult(res);
-//    freeMemory(memory);
+    freeMemory(memory);
     return 0;
 
 }
