@@ -91,7 +91,7 @@ void dump(type *Type, int* cursor) {
 //create new type
 void createType(type* T) {
     T->header = 'N'; //NONE or NULL
-    T->row = malloc(sizeof(char) * DEFAULT_SIZE);
+    T->row = malloc(sizeof(char) * 3);
     T->row_length = 0;
     T->str = malloc(sizeof(char*) * DEFAULT_SIZE);
     for (int i = 0; i < DEFAULT_SIZE; i++) {
@@ -184,7 +184,6 @@ void readFromFileV2(char* filename, Memory* memory) {
             if (headerIsValid(symbol)) {
                 if (++memory->used == memory->size) resizeMemory(memory);
                 memory->Type[memory->used]->header = symbol;
-                memory->Type[memory->used]->row = malloc(sizeof(char) * 3);
                 sprintf(memory->Type[memory->used]->row, "%d", row);
                 continue;
             } else {
