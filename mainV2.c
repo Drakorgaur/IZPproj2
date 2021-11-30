@@ -251,12 +251,12 @@ void selectByValue(Memory* memory, result* res, char ch) {
 //create function to copy type and return it
 void copyType(type* newType, type* oldType) {
     newType->header = oldType->header;
-    newType->elements_amount = oldType->elements_amount;
+    newType->elements_amount = oldType->elements_used;
     newType->elements_used = oldType->elements_used;
     newType->row = malloc(sizeof(char) * 3);
     strcpy(newType->row, oldType->row);
-    newType->str = malloc(sizeof(char*) * newType->elements_amount);
-    for (int i = 0; i < newType->elements_amount; i++) {
+    newType->str = malloc(sizeof(char*) * newType->elements_used);
+    for (int i = 0; i < newType->elements_used; i++) {
         newType->str[i] = malloc(sizeof(char) * MAX_SIZE);
         strcpy(newType->str[i], oldType->str[i]);
     }
@@ -633,6 +633,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+//    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
 //    executeFunction(memory);
 
 //    type* A= malloc(sizeof(type));
