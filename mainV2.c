@@ -559,7 +559,6 @@ void executeFunction(Memory* memory) {
 
         type* command = malloc(sizeof(type));
         selectByRow(memory, command, commands->array[i]);
-        printf("for command on %s row\n\n", command->row);
         for (int element = 1; element < command->elements_used; element++) {
             type* Type = malloc(sizeof(type));
             Type->header = 'E';
