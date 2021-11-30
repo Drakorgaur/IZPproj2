@@ -554,7 +554,7 @@ void executeFunction(Memory* memory) {
     foreachResult {
         bool commandIsValid = true;
         Memory* executive = malloc(sizeof(Memory));
-        executive->size = DEFAULT_SIZE;
+        executive->size = 1;
         executive->used = 0;
         executive->Type = malloc(sizeof(type) * DEFAULT_SIZE);
 
@@ -577,6 +577,8 @@ void executeFunction(Memory* memory) {
             if (++executive->used == executive->size) {
                 executive->size++;
                 executive->Type = realloc(executive->Type, sizeof(type*) * executive->size);
+                executive->Type[executive->used] = malloc(sizeof(type));
+                createType(executive->Type[executive->used]);
             }
             freeType(Type);
         }
@@ -585,12 +587,10 @@ void executeFunction(Memory* memory) {
             freeMemory(executive);
             continue;
         }
-
         result* Universum = createResult();
         selectByValue(memory, Universum, 'U');
         type* U = malloc(sizeof(type));
         selectByRow(memory, U, Universum->array[0]);
-
         char* str = malloc(sizeof(char) * (size * MAX_SIZE));
         strcpy(str, callFunctionByItName(command->str[0], executive, U));
         for (int j = 0; j < memory->used; j++) {
@@ -602,11 +602,10 @@ void executeFunction(Memory* memory) {
                 strcpy(memory->Type[j]->str[0], str);
             }
         }
-
         free(str);
         freeType(U);
-        freeResult(Universum);
         freeType(command);
+        freeResult(Universum);
         freeMemory(executive);
     }
     freeResult(commands);
@@ -634,7 +633,7 @@ int main(int argc, char **argv) {
     }
 
 //    for (int i = 0; i < memory->used; i++) var_dump(memory->Type[i]);
-//    executeFunction(memory);
+    executeFunction(memory);
 
 //    type* A= malloc(sizeof(type));
 //    createType(A);
@@ -642,8 +641,8 @@ int main(int argc, char **argv) {
 //    var_dump(A);
 //    freeType(A);
 
-//    int cursor = 1;
-//    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
+    int cursor = 1;
+    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 
     freeResult(res);
     freeMemory(memory);
