@@ -214,7 +214,7 @@ void freeType(type* Type) {
 }
 
 void freeMemory(Memory* memory) {
-    for (int i = 0; i < memory->size; i++) {
+    for (int i = 0; i < memory->used; i++) {
         for (int j = 0; j < memory->Type[i]->elements_amount; j++) freeType(memory->Type[i]);
         free(memory->Type[i]->str);
         free(memory->Type[i]->row);
@@ -621,8 +621,8 @@ void executeFunction(Memory* memory) {
 }
 
 int main(int argc, char **argv) {
-    Memory *memory = createMemory();
-//    result* res = createResult();
+//    Memory *memory = createMemory();
+    result* res = createResult();
 //    readFromFileV2(argv[1], memory);
 
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
@@ -642,8 +642,8 @@ int main(int argc, char **argv) {
 //    int cursor = 1;
 //    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 
-//    freeResult(res);
-    freeMemory(memory);
+    freeResult(res);
+//    freeMemory(memory);
     return 0;
 
 }
