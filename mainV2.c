@@ -206,21 +206,21 @@ void readFromFileV2(char* filename, Memory* memory) {
     fclose(file); free(wordBuffer);
 }
 
-void freeMemory(Memory* memory) {
-    for (int i = 0; i < memory->size; i++) {
-        for (int j = 0; j < memory->Type[i]->elements_amount; j++) free(memory->Type[i]->str[j]);
-        free(memory->Type[i]->str);
-        free(memory->Type[i]->row);
-    }
-    free(memory->Type);
-    free(memory);
-}
-
 void freeType(type* Type) {
     for (int i = 0; i < Type->elements_amount; i++) free(Type->str[i]);
     free(Type->str);
     free(Type->row);
     free(Type);
+}
+
+void freeMemory(Memory* memory) {
+    for (int i = 0; i < memory->used; i++) {
+        for (int j = 0; j < memory->Type[i]->elements_amount; j++) freeType(memory->Type[i]);
+        free(memory->Type[i]->str);
+        free(memory->Type[i]->row);
+    }
+    free(memory->Type);
+    free(memory);
 }
 
 void freeResult(result* res) {
