@@ -56,6 +56,7 @@ bool valueIsValid(char value)
 }
 
 bool typeIsValid(type* A) {
+    if (A->header == 'E') return false;
     if (A->elements_used < 0) return false;
     return true;
 }
@@ -288,11 +289,14 @@ bool empty(type* A) {
     if (A->elements_used == 0) return true;
     return false;
 }
+//create function to convert int to char
+char* intToChar(int number) {
+}
 
 char* card(type* A) {
-    int size = (A->elements_used / 10) + 1;
-    char str[size];
-    return itoa(A->elements_used, str, 10);
+    char* str = malloc(sizeof(char) * MAX_SIZE);
+    sprintf(str, "%d", A->elements_used);
+    return str;
 }
 
 char* complement(type* A, type* U) {
@@ -570,6 +574,7 @@ void executeFunction(Memory* memory) {
         printf("for command on %s row\n\n", command->row);
         for (int element = 1; element < command->elements_used; element++) {
             type* Type = malloc(sizeof(type));
+            Type->header = 'E';
             selectByRow(memory, Type, command->str[element]);
             if (!typeIsValid(Type)) {
                 printf("[ERROR] while executing command on %s row\nSet / Relation / Universum are blank or do "
@@ -598,7 +603,7 @@ void executeFunction(Memory* memory) {
         selectByRow(memory, U, Universum->array[0]);
 
         char* str = malloc(sizeof(char) * (size * MAX_SIZE));
-        str = callFunctionByItName(command->str[0], executive, U);
+        strcpy(str, callFunctionByItName(command->str[0], executive, U));
         for (int j = 0; j < memory->used; j++) {
             if (strcmp(memory->Type[j]->row, commands->array[i]) == 0) {
                 memory->Type[j]->header = 'F';
@@ -609,13 +614,12 @@ void executeFunction(Memory* memory) {
             }
         }
 
+        free(str);
         freeType(U);
         freeResult(Universum);
         freeType(command);
         freeMemory(executive);
     }
-
-
     freeResult(commands);
 }
 
