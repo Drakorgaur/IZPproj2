@@ -148,28 +148,26 @@ void readFromFileV2(char* filename, Memory* memory) {
                     headerChecker = false;
                     continue;
                 }
-
-                strcpy(TYPE[memory->used]->str[TYPE[memory->used]->elements_used], wordBuffer);
-
+                strcpy(memory->Type[memory->used]->str[memory->Type[memory->used]->elements_used], wordBuffer);
                 if (strcmp(wordBuffer, "") != 0) {
-                    TYPE[memory->used]->elements_used++;
+                    memory->Type[memory->used]->elements_used++;
                 }
                 strcpy(wordBuffer, "");
-                if (TYPE[memory->used]->elements_used == TYPE[memory->used]->elements_amount) resizeStr(TYPE[memory->used]);
+                if (memory->Type[memory->used]->elements_used == memory->Type[memory->used]->elements_amount)
+                    resizeStr(memory->Type[memory->used]);
                 wordSize = 0;
             }
             if (symbol == '\n') {
                 row++;
                 wordSize = 0;
                 symbol = fgetc(file);
-
                 if (!headerChecker) {
-                    strcpy(TYPE[memory->used]->str[TYPE[memory->used]->elements_used], wordBuffer);
-                    if (strcmp(wordBuffer, "") != 0) {
-                        TYPE[memory->used]->elements_used++;
-                    }
+                    strcpy(memory->Type[memory->used]->str[memory->Type[memory->used]->elements_used], wordBuffer);
+                    if (strcmp(wordBuffer, "") != 0)
+                        memory->Type[memory->used]->elements_used++;
                     strcpy(wordBuffer, "");
-                    if (TYPE[memory->used]->elements_used == TYPE[memory->used]->elements_amount) resizeStr(TYPE[memory->used]);
+                    if (memory->Type[memory->used]->elements_used == memory->Type[memory->used]->elements_amount)
+                        resizeStr(memory->Type[memory->used]);
                 }
                 headerChecker = true;
                 continue;
@@ -185,9 +183,9 @@ void readFromFileV2(char* filename, Memory* memory) {
         if (headerChecker) {
             if (headerIsValid(symbol)) {
                 if (++memory->used == memory->size) resizeMemory(memory);
-                TYPE[memory->used]->header = symbol;
-                TYPE[memory->used]->row = malloc(sizeof(char) * 3);
-                sprintf(TYPE[memory->used]->row, "%d", row);
+                memory->Type[memory->used]->header = symbol;
+                memory->Type[memory->used]->row = malloc(sizeof(char) * 3);
+                sprintf(memory->Type[memory->used]->row, "%d", row);
                 continue;
             } else {
                 if(feof(file)) {
@@ -623,7 +621,13 @@ int main(int argc, char **argv) {
     (void)argc;
     Memory *memory = createMemory();
 //    result* res = createResult();
-    readFromFileV2(argv[1], memory);
+    memory->used = 2;
+    resizeMemory(memory);
+    var_dump(memory->Type[0]);
+    var_dump(memory->Type[1]);
+    var_dump(memory->Type[2]);
+    resizeStr(memory->Type[0]);
+//    readFromFileV2(argv[1], memory);
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
 //        printf("ERROR: relation is not valid\n");
 //        freeMemory(memory);
