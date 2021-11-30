@@ -92,10 +92,10 @@ void dump(type *Type, int* cursor) {
 void createType(type* T) {
     T->header = 'N'; //NONE or NULL
     T->row = malloc(sizeof(char) * 3);
-    T->row_length = 0;
     T->str = malloc(sizeof(char*) * DEFAULT_SIZE);
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         T->str[i] = malloc(sizeof(char) * MAX_SIZE);
+        strcpy(T->str[i], "");
     }
     T->elements_amount = DEFAULT_SIZE;
     T->elements_used = 0;
@@ -253,8 +253,7 @@ void copyType(type* newType, type* oldType) {
     newType->header = oldType->header;
     newType->elements_amount = oldType->elements_amount;
     newType->elements_used = oldType->elements_used;
-    newType->row_length = oldType->row_length;
-    newType->row = malloc(sizeof(char) * newType->row_length + 1);
+    newType->row = malloc(sizeof(char) * 3);
     strcpy(newType->row, oldType->row);
     newType->str = malloc(sizeof(char*) * newType->elements_amount);
     for (int i = 0; i < newType->elements_amount; i++) {
@@ -264,9 +263,6 @@ void copyType(type* newType, type* oldType) {
 }
 
 void selectByRow(Memory* memory, type* newType, char* line) {
-//    SELECT_FROM_TYPES ROW(line)
-//                copyType(newType, TYPE[i]);
-//    end
     for (int i = 0; i < memory->used; i++) {
         if (strcmp(memory->Type[i]->row, line) == 0) {
             copyType(newType, TYPE[i]);
