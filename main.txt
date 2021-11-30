@@ -3,15 +3,5 @@ S
 S
 R (dad dad) (dad girl) (mom boy) (mom girl)
 
-C empty 2
-
-S dad mom
-
-R (dad man) (boy man) (mom woman) (girl woman)
-
-C empty 2
-
-C card 4
-
 
 
