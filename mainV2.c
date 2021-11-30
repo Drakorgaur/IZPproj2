@@ -214,7 +214,7 @@ void freeType(type* Type) {
 }
 
 void freeMemory(Memory* memory) {
-    for (int i = 0; i < memory->used; i++) {
+    for (int i = 0; i < memory->size; i++) {
         for (int j = 0; j < memory->Type[i]->elements_amount; j++) freeType(memory->Type[i]);
         free(memory->Type[i]->str);
         free(memory->Type[i]->row);
