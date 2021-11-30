@@ -88,6 +88,16 @@ void dump(type *Type, int* cursor) {
     *cursor = atoi(Type->row);
 }
 
+//create new type
+void createType(type* T) {
+    T->header = 'N'; //NONE or NULL
+    T->row = NULL;
+    T->row_length = 0;
+    T->str = NULL;
+    T->elements_amount = 0;
+    T->elements_used = 0;
+}
+
 type** initTypeArray() {
     type** Type = malloc(sizeof(type*) * DEFAULT_SIZE);
     for (int i = 0; i < DEFAULT_SIZE; i++) {
@@ -515,12 +525,12 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     return true;
 }
 
-#define A 0
-#define B 1
-#define C 2
 char* callFunctionByItName(char* name, Memory* executors, type* U) {
+    int A = 0;
+    int B = 1;
+    int C = 2;
     if (strcmp(name, "empty") == 0) {
-        if (empty(executors->Type[A])) { return "true"; } else { return "false"; }
+        if (empty(executors->Type[0])) { return "true"; } else { return "false"; }
     }
     if (strcmp(name, "card") == 0) return card(executors->Type[A]);
     if (strcmp(name, "complement") == 0) return complement(executors->Type[A], U);
@@ -622,7 +632,7 @@ void executeFunction(Memory* memory) {
 
 int main(int argc, char **argv) {
 //    Memory *memory = createMemory();
-    result* res = createResult();
+//    result* res = createResult();
 //    readFromFileV2(argv[1], memory);
 
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
@@ -634,15 +644,16 @@ int main(int argc, char **argv) {
 
 //    executeFunction(memory);
 
-//    type* A= malloc(sizeof(type));
+    type* A= malloc(sizeof(type));
+    createType(A);
 //    selectByRow(memory, A, "2");
 //    var_dump(A);
-//    freeType(A);
+    freeType(A);
 
 //    int cursor = 1;
 //    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 
-    freeResult(res);
+//    freeResult(res);
 //    freeMemory(memory);
     return 0;
 
