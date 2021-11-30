@@ -91,10 +91,10 @@ void dump(type *Type, int* cursor) {
 //create new type
 void createType(type* T) {
     T->header = 'N'; //NONE or NULL
-    T->row = NULL;
+    T->row = malloc(sizeof(char) * DEFAULT_SIZE);
     T->row_length = 0;
-    T->str = NULL;
-    T->elements_amount = 0;
+    T->str = malloc(sizeof(char) * DEFAULT_SIZE);
+    T->elements_amount = DEFAULT_SIZE;
     T->elements_used = 0;
 }
 
@@ -104,12 +104,7 @@ type** initTypeArray() {
         Type[i] = malloc(sizeof(type));
     }
     for (int i = 0; i < DEFAULT_SIZE; i++) {
-        Type[i]->elements_amount = DEFAULT_SIZE;
-        Type[i]->elements_used = 0;
-        Type[i]->header = EMPTY;
-        Type[i]->row = malloc(sizeof(char) * DEFAULT_SIZE);
-        Type[i]->row_length = DEFAULT_SIZE + 1;
-        Type[i]->str = malloc(sizeof(char*) * DEFAULT_SIZE);
+        createType(Type[i]);
         forDefault Type[i]->str[j] = malloc(sizeof(char) * MAX_SIZE);
     }
     return Type;
