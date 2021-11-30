@@ -620,7 +620,7 @@ int main(int argc, char **argv) {
     (void)argc;
     Memory *memory = createMemory();
 
-//    result* res = createResult();
+    result* res = createResult();
 //    memory->used = 2;
 //    resizeMemory(memory);
 //    var_dump(memory->Type[0]);
@@ -630,12 +630,12 @@ int main(int argc, char **argv) {
 
     readFromFileV2(argv[1], memory);
 
-//    if (!checkForRelationAndSetElementsInUniversum(memory)) {
-//        printf("ERROR: relation is not valid\n");
-//        freeMemory(memory);
-//        freeResult(res);
-//        return 1;
-//    }
+    if (!checkForRelationAndSetElementsInUniversum(memory)) {
+        printf("ERROR: relation is not valid\n");
+        freeMemory(memory);
+        freeResult(res);
+        return 1;
+    }
 
 //    executeFunction(memory);
 
@@ -648,7 +648,7 @@ int main(int argc, char **argv) {
 //    int cursor = 1;
 //    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 
-//    freeResult(res);
+    freeResult(res);
     freeMemory(memory);
     return 0;
 
