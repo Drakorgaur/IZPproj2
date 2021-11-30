@@ -224,7 +224,7 @@ void freeMemory(Memory* memory) {
 }
 
 void freeResult(result* res) {
-    for (int i = 0; i < res->used; i++) free(res->array[i]);
+    for (int i = 0; i < res->size; i++) free(res->array[i]);
     free(res->array);
     free(res);
 }
