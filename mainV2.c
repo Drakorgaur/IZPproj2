@@ -623,12 +623,7 @@ int main(int argc, char **argv) {
     (void)argc;
     Memory *memory = createMemory();
 //    result* res = createResult();
-//    readFromFileV2(argv[1], memory);
-    memory->used = 2;
-    resizeMemory(memory);
-    var_dump(memory->Type[0]);
-    var_dump(memory->Type[1]);
-    var_dump(memory->Type[2]);
+    readFromFileV2(argv[1], memory);
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
 //        printf("ERROR: relation is not valid\n");
 //        freeMemory(memory);
