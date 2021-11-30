@@ -122,13 +122,7 @@ void resizeMemory(Memory* memory) {
     memory->size++;
     memory->Type = realloc(memory->Type, sizeof(type*) * memory->size);
     memory->Type[memory->used] = malloc(sizeof(type));
-    memory->Type[memory->used]->elements_amount = DEFAULT_SIZE;
-    memory->Type[memory->used]->elements_used = 0;
-    memory->Type[memory->used]->header = EMPTY;
-    memory->Type[memory->used]->row = malloc(sizeof(char) * DEFAULT_SIZE);
-    memory->Type[memory->used]->row_length = DEFAULT_SIZE + 1;
-    memory->Type[memory->used]->str = (char **)malloc(sizeof(char *) * DEFAULT_SIZE);
-    forDefault memory->Type[memory->used]->str[j] = (char *)malloc(sizeof(char) * MAX_SIZE);
+    createType(memory->Type[memory->used]);
 }
 
 void resizeStr(type* T) {
