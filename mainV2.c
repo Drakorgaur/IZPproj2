@@ -207,7 +207,7 @@ void readFromFileV2(char* filename, Memory* memory) {
 }
 
 void freeMemory(Memory* memory) {
-    for (int i = 0; i < memory->used; i++) {
+    for (int i = 0; i < memory->size; i++) {
         for (int j = 0; j < memory->Type[i]->elements_amount; j++) free(memory->Type[i]->str[j]);
         free(memory->Type[i]->str);
         free(memory->Type[i]->row);
@@ -288,9 +288,6 @@ bool checkIfTypeStrEmpty(type* A) {
 bool empty(type* A) {
     if (A->elements_used == 0) return true;
     return false;
-}
-//create function to convert int to char
-char* intToChar(int number) {
 }
 
 char* card(type* A) {
@@ -625,8 +622,8 @@ void executeFunction(Memory* memory) {
 
 int main(int argc, char **argv) {
     Memory *memory = createMemory();
-    result* res = createResult();
-    readFromFileV2(argv[1], memory);
+//    result* res = createResult();
+//    readFromFileV2(argv[1], memory);
 
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
 //        printf("ERROR: relation is not valid\n");
@@ -635,18 +632,18 @@ int main(int argc, char **argv) {
 //        return 1;
 //    }
 
-    executeFunction(memory);
+//    executeFunction(memory);
 
 //    type* A= malloc(sizeof(type));
 //    selectByRow(memory, A, "2");
 //    var_dump(A);
 //    freeType(A);
 
-    int cursor = 1;
-    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
+//    int cursor = 1;
+//    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 
+//    freeResult(res);
     freeMemory(memory);
-    freeResult(res);
     return 0;
 
 }
