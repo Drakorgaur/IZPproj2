@@ -1,7 +1,7 @@
 U dad mom girl boy man woman
 S
 S
-R (dad dad) (dad girl) (mom boy) (mom girl)
+R (dad dad) (dad girl) (mom boy) (mom girl) (girl girl) (mom mom)
 
 C empty 2
 
@@ -9,9 +9,9 @@ S dad mom
 
 R (dad man) (boy man) (mom woman) (girl woman)
 
-C empty 2 3
+C reflexive 4
 
-C card 4
+C card 2
 
 
 

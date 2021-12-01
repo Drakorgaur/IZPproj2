@@ -390,8 +390,40 @@ char* equals(type* A, type* B) {
  * TODO: test
  */
 char* reflexive(type* A) {
+    int size = 0;
+    char elements[A->elements_used][31];
+    if (A->elements_used == 0) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    strcpy(elements[size], A->str[0]);
+    size++;
     for (int i = 0; i < A->elements_used; i++) {
-        if (strcmp(A->str[i], A->str[i]) != 0) return false;
+        bool found = false;
+        for (int j = 0; j < size; j++) {
+            if (strcmp(A->str[i], elements[j]) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            (size)++;
+            strcpy(elements[size], A->str[i]);
+        }
+    }
+    for (int j = 0; j < size; j++) {
+        bool found = false;
+        for (int i = 0; i < A->elements_used; i += 2) {
+            if (strcmp(elements[j], A->str[i]) == 0) {
+                if (strcmp(elements[j], A->str[i + 1]) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            return "false";
+        }
     }
     return "true";
 }
@@ -510,73 +542,177 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     return true;
 }
 
+bool checkHeader(type* A, char header) {
+    if (A->header == header) return false;
+    return true;
+}
+
 void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     int A = 0;
     int B = 1;
     int C = 2;
     if (executors->used == 1) {
         if (strcmp(name, "empty") == 0) {
+            if (checkHeader(executors->Type[0], 'S')) {
+                fprintf(stderr, "Error: empty() can be used only with sets\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
             strcpy(str, empty(executors->Type[0], str)); return;
         }
         if (strcmp(name, "card") == 0) {
+            if (checkHeader(executors->Type[0], 'S')) {
+                fprintf(stderr, "Error: card() can be used only with sets\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
             sprintf(str, "%d", card(executors->Type[0])); return;
         }
         if (strcmp(name, "complement") == 0) {
-            strcpy(str, complement(executors->Type[A], U, str)); return;
+            if (checkHeader(executors->Type[0], 'S')) {
+                fprintf(stderr, "Error: complement() can be used only with sets\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, complement(executors->Type[0], U, str)); return;
         }
         if (strcmp(name, "reflexive") == 0) {
-            strcpy(str, reflexive(executors->Type[A])); return;
+            if (checkHeader(executors->Type[0], 'R')) {
+                fprintf(stderr, "Error: reflexive() can be used only with relations\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, reflexive(executors->Type[0])); return;
         }
         if (strcmp(name, "symmetric") == 0) {
-            strcpy(str, symmetric(executors->Type[A])); return;
+            if (checkHeader(executors->Type[0], 'R')) {
+                fprintf(stderr, "Error: symmetric() can be used only with relations\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, symmetric(executors->Type[0])); return;
         }
         if (strcmp(name, "antisymmetric") == 0) {
-            strcpy(str, antisymmetric(executors->Type[A])); return;
+            if (checkHeader(executors->Type[0], 'R')) {
+                fprintf(stderr, "Error: antisymmetric() can be used only with relations\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, antisymmetric(executors->Type[0])); return;
         }
         if (strcmp(name, "transitive") == 0) {
-            strcpy(str, transitive(executors->Type[A])); return;
+            if (checkHeader(executors->Type[0], 'R')) {
+                fprintf(stderr, "Error: transitive() can be used only with relations\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, transitive(executors->Type[0])); return;
         }
         if (strcmp(name, "function") == 0) {
-            strcpy(str, function(executors->Type[A])); return;
+            if (checkHeader(executors->Type[0], 'R')) {
+                fprintf(stderr, "Error: function() can be used only with relations\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, function(executors->Type[0])); return;
         }
         if (strcmp(name, "domain") == 0) {
-            strcpy(str, domain(executors->Type[A], str)); return;
+            if (checkHeader(executors->Type[0], 'R')) {
+                fprintf(stderr, "Error: domain() can be used only with relations\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, domain(executors->Type[0], str)); return;
         }
         if (strcmp(name, "codomain") == 0) {
-            strcpy(str, codomain(executors->Type[A], str)); return;
+            if (checkHeader(executors->Type[0], 'R')) {
+                fprintf(stderr, "Error: codomain() can be used only with relations\n");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, codomain(executors->Type[0], str)); return;
         }
     }
 
     if (executors->used == 2) {
         if (strcmp(name, "union") == 0) {
-            strcpy(str, union_(executors->Type[A], executors->Type[B], str)); return;
+            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+                fprintf(stderr, "Error: union() can be used only with sets");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, union_(executors->Type[0], executors->Type[1], str)); return;
         }
         if (strcmp(name, "intersect") == 0) {
-            strcpy(str, intersect(executors->Type[A], executors->Type[B], str)); return;
+            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+                fprintf(stderr, "Error: intersect() can be used only with sets");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, intersect(executors->Type[0], executors->Type[1], str)); return;
         }
         if (strcmp(name, "minus") == 0) {
-            strcpy(str, minus(executors->Type[A], executors->Type[B], str)); return;
+            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+                fprintf(stderr, "Error: minus() can be used only with sets");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, minus(executors->Type[0], executors->Type[1], str)); return;
         }
         if (strcmp(name, "subseteq") == 0) {
-            strcpy(str, subseteq(executors->Type[A], executors->Type[B])); return;
+            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+                fprintf(stderr, "Error: subseteq() can be used only with sets");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, subseteq(executors->Type[0], executors->Type[1])); return;
         }
         if (strcmp(name, "subset") == 0) {
-            strcpy(str, subset(executors->Type[A], executors->Type[B])); return;
+            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+                fprintf(stderr, "Error: subset() can be used only with sets");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, subset(executors->Type[0], executors->Type[1])); return;
         }
         if (strcmp(name, "equals") == 0) {
-            strcpy(str, equals(executors->Type[A], executors->Type[B])); return;
+            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+                fprintf(stderr, "Error: equals() can be used only with sets");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, equals(executors->Type[0], executors->Type[1])); return;
         }
     }
 
     if (executors->used == 3) {
-        if (strcmp(name, "injective") == 0) {
-            strcpy(str, injective(executors->Type[A], executors->Type[B], executors->Type[C])); return;
+        if (strcmp(name, "injective") == 0)
+        {
+            if (checkHeader(executors->Type[0], 'R') && checkHeader(executors->Type[1], 'S')
+                                                                    && checkHeader(executors->Type[2], 'S')) {
+                fprintf(stderr, "Error: equals() can be used only with R S S format");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, injective(executors->Type[0], executors->Type[1], executors->Type[2])); return;
         }
         if (strcmp(name, "surjective") == 0) {
-            strcpy(str, surjective(executors->Type[A], executors->Type[B], executors->Type[C])); return;
+            if (checkHeader(executors->Type[0], 'R') && checkHeader(executors->Type[1], 'S')
+                                                                    && checkHeader(executors->Type[2], 'S')) {
+                fprintf(stderr, "Error: equals() can be used only with R S S format");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, surjective(executors->Type[0], executors->Type[1], executors->Type[2])); return;
         }
         if (strcmp(name, "bijective") == 0) {
-            strcpy(str, bijective(executors->Type[A], executors->Type[B], executors->Type[C])); return;
+            if (checkHeader(executors->Type[0], 'R') && checkHeader(executors->Type[1], 'S')
+                                                                    && checkHeader(executors->Type[2], 'S')) {
+                fprintf(stderr, "Error: equals() can be used only with R S S format");
+                strcpy(str, "FAIL\n");
+                return;
+            }
+            strcpy(str, bijective(executors->Type[0], executors->Type[1], executors->Type[2])); return;
         }
     }
     strcpy(str, "Error: not right function atributes");
@@ -698,8 +834,8 @@ int main(int argc, char **argv) {
     result* res = createResult();
     Memory *memory = createMemory();
     readFromFileV2(argv[1], memory);
-    int cursor = 1;
-    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
+//    int cursor = 1;
+//    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
 //    if (!checkForRelationAndSetElementsInUniversum(memory)) {
 //        printf("ERROR: relation is not valid\n");
 //        freeMemory(memory);
@@ -711,9 +847,8 @@ int main(int argc, char **argv) {
         freeMemory(memory);
         return 1;
     }
-    printf("----------------------------------------------------\n");
-//    executeFunction(memory);
-    cursor = 1;
+    executeFunction(memory);
+    int cursor = 1;
     for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
     freeResult(res);
     freeMemory(memory);
