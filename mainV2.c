@@ -671,6 +671,9 @@ bool checkAndRefactorRelations(Memory* memory) {
                 char* p = strstr(memory->Type[i]->str[j], str);
                 char* p2 = strstr(memory->Type[i]->str[j], str2);
                 if (!(j % 2) && p != NULL) {
+                    /*
+                     * TODO: fix overlapping
+                     */
                     p++;
                     strcpy(memory->Type[i]->str[j], p);
                     continue;
