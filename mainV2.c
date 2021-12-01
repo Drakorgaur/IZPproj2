@@ -51,7 +51,8 @@ bool headerIsValid(char header) {
 
 bool valueIsValid(char value)
 {
-    if (((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9'))) return true;
+    if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9')
+    || (value == '(' || value == ')')) return true;
     return false;
 }
 
@@ -656,28 +657,62 @@ void executeFunction(Memory* memory) {
     freeResult(commands);
 }
 
+bool checkAndRefactorRelations(Memory* memory) {
+    printf("\n");
+    for (int i = 0; i < memory->used; i++) {
+        if (memory->Type[i]->header == 'R') {
+            if (memory->Type[i]->elements_used % 2) {
+                fprintf(stderr, "Relation have odd amount of elements\n");
+                return false;
+            }
+            for (int j = 0; j < memory->Type[i]->elements_used; j++) {
+                char* str = "(";
+                char* str2 = ")";
+                char* p = strstr(memory->Type[i]->str[j], str);
+                char* p2 = strstr(memory->Type[i]->str[j], str2);
+                if (!(j % 2) && p != NULL) {
+                    p++;
+                    strcpy(memory->Type[i]->str[j], p);
+                    continue;
+                }
+                if (j % 2 && p2 != NULL) {
+                    char* temp = memory->Type[i]->str[j];
+                    int size = strlen(temp);
+                    temp[size - 1] = '\0';
+                    strcpy(memory->Type[i]->str[j], temp);
+                    continue;
+                }
+                fprintf(stderr, "Relation have wrong input format\n");
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 int main(int argc, char **argv) {
     (void)argc;
-    Memory *memory = createMemory();
-
     result* res = createResult();
-
+    Memory *memory = createMemory();
     readFromFileV2(argv[1], memory);
-
-    if (!checkForRelationAndSetElementsInUniversum(memory)) {
-        printf("ERROR: relation is not valid\n");
-        freeMemory(memory);
-        freeResult(res);
-        return 1;
-    }
-
-    executeFunction(memory);
-
     int cursor = 1;
     for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
-
+//    if (!checkForRelationAndSetElementsInUniversum(memory)) {
+//        printf("ERROR: relation is not valid\n");
+//        freeMemory(memory);
+//        freeResult(res);
+//        return 1;
+//    }
+    if (!checkAndRefactorRelations(memory)) {
+        freeResult(res);
+        freeMemory(memory);
+        return 1;
+    }
+    printf("----------------------------------------------------\n");
+//    executeFunction(memory);
+    cursor = 1;
+    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
     freeResult(res);
     freeMemory(memory);
     return 0;
-
 }

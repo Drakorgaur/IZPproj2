@@ -7,7 +7,7 @@ C empty 2
 
 S dad mom
 
-R (dad man) (boy man) (mom woman) (girl woman)
+R (dad man) (boy man) (mom woman) (girl woman) (hell
 
 C empty 2 3
 
