@@ -178,7 +178,7 @@ void readFromFileV2(char* filename, Memory* memory) {
         if (wordSize == MAX_SIZE) {
             fclose(file);
             free(wordBuffer);
-            printf("ERROR: element couldn't have size more than 30\n");
+            fprintf(stderr, "Error: element couldn't have size more than 30\n");
             exit(1);
         }
         if (headerChecker) {
@@ -191,6 +191,7 @@ void readFromFileV2(char* filename, Memory* memory) {
                 if(feof(file)) {
                     continue;
                 }
+                fprintf(stderr, "Error: header is invalid\n");
                 free(wordBuffer);
                 fclose(file);
                 exit(1);
@@ -836,15 +837,15 @@ int main(int argc, char **argv) {
     readFromFileV2(argv[1], memory);
 //    int cursor = 1;
 //    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
-//    if (!checkForRelationAndSetElementsInUniversum(memory)) {
-//        printf("ERROR: relation is not valid\n");
-//        freeMemory(memory);
-//        freeResult(res);
-//        return 1;
-//    }
     if (!checkAndRefactorRelations(memory)) {
         freeResult(res);
         freeMemory(memory);
+        return 1;
+    }
+    if (!checkForRelationAndSetElementsInUniversum(memory)) {
+        fprintf(stderr, "ERROR: set/relation have element that is not in univesum\n");
+        freeMemory(memory);
+        freeResult(res);
         return 1;
     }
     executeFunction(memory);
