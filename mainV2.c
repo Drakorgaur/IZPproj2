@@ -1004,10 +1004,13 @@ void executeFunction(Memory* memory) {
     foreachResult {
         bool commandIsValid = true;
         Memory* executive = malloc(sizeof(Memory));
-        executive->size = 1;
+        executive->size = DEFAULT_SIZE;
         executive->used = 0;
         executive->Type = malloc(sizeof(type*) * DEFAULT_SIZE);
-        executive->Type[executive->used] = malloc(sizeof(type));
+        for (int j = 0; j < executive->size; j++) {
+            executive->Type[j] = malloc(sizeof(type));
+            createType(executive->Type[j]);
+        }
 
         type* command = malloc(sizeof(type));
         selectByRow(memory, command, commands->array[i]);
