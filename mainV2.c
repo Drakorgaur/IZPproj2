@@ -101,15 +101,24 @@ void dump(type *Type, int* cursor) {
     *cursor = atoi(Type->row);
 }
 
-//create new type
-void createType(type* T) {
-    T->header = 'N'; //NONE or NULL
+void createRow(type* T) {
     T->row = malloc(sizeof(char) * 3);
+}
+void createStr(type* T) {
     T->str = malloc(sizeof(char*) * DEFAULT_SIZE);
+}
+void createStrArray(type* T) {
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         T->str[i] = malloc(sizeof(char) * MAX_SIZE);
         strcpy(T->str[i], "");
     }
+}
+//create new type
+void createType(type* T) {
+    T->header = 'N'; //NONE or NULL
+    createRow(T);
+    createStr(T);
+    createStrArray(T);
     T->elements_amount = DEFAULT_SIZE;
     T->elements_used = 0;
 }
