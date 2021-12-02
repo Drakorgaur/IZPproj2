@@ -1,11 +1,11 @@
 U dad mom girl boy man woman dog
-S boy dad dog mom girl
-S mom dad dog woman
-R (boy mom) (dad dad) (dog girl) (mom boy) (girl dog)
+S boy dad dog mom girl woman
+S boy dad dog mom girl woman
+R (boy mom) (mom boy) (boy boy) (mom mom)
 R
 S dad mom
 R (dad man) (boy man) (mom woman) (girl woman)
-C subseteq 3 2
+C transitive 4
 
 
 

@@ -424,12 +424,16 @@ char* subseteq(type* A, type* B) {
  * TODO: test
  */
 char* subset(type* A, type* B) {
+    if (A->elements_used == B->elements_used) return "false";
     for (int i = 0; i < A->elements_used; i++) {
+        bool found = false;
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
+                found = true;
                 break;
             }
         }
+        if (!found) return "false";
     }
     return "true";
 }
@@ -438,12 +442,16 @@ char* subset(type* A, type* B) {
  * TODO: test
  */
 char* equals(type* A, type* B) {
+    if (A->elements_used != B->elements_used) return "false";
     for (int i = 0; i < A->elements_used; i++) {
+        bool found = false;
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
+                found = true;
                 break;
             }
         }
+        if (!found) return "false";
     }
     return "true";
 }
@@ -555,12 +563,23 @@ char* antisymmetric(type* A) {
 /*
  * TODO: NOT DONE - NEED TO CHECK AND TEST
  */
-char* transitive(type* A) {
-    for (int i = 0; i < A->elements_used; i++) {
-        for (int j = 0; j < A->elements_used; j++) {
-            for (int k = 0; k < A->elements_used; k++) {
-                if (strcmp(A->str[i], A->str[j]) == 0 && strcmp(A->str[j], A->str[k]) == 0 && i != j && j != k) return false;
+char* transitive(type* R) {
+    for (int i = 0; i < R->elements_used; i+=2) {
+        bool transitive = false;
+        for (int j = 0; j < R->elements_used; j+=2) {
+            if (strcmp(R->str[i+1], R->str[j]) == 0) {
+                for (int k = 0; k < R->elements_used; k+=2) {
+                    if (strcmp(R->str[k], R->str[i]) == 0 && k != i) {
+                        if (strcmp(R->str[k+1], R->str[j+1]) == 0) {
+                            transitive = true;
+                            break;
+                        }
+                    }
+                }
             }
+        }
+        if (!transitive) {
+            return "false";
         }
     }
     return "true";
