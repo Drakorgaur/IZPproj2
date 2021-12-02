@@ -386,17 +386,21 @@ void intersect(type* A, type* B, char* str) {
 /*
  * TODO: test
  */
-char* minus(type* A, type* B, char* str) {
+void minus(type* A, type* B, char* str) {
+    strcpy(str, "");
     for (int i = 0; i < A->elements_used; i++) {
+        bool found = false;
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
-                strcpy(A->str[i], "");
+                found = true;
                 break;
             }
         }
-        printf("%s ", A->str[i]);
+        if (!found) {
+            strcpy(str, A->str[i]);
+            strcat(str, " ");
+        }
     }
-    return "";
 }
 
 /*
@@ -940,7 +944,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, minus(executors->Type[0], executors->Type[1], str)); return;
+            minus(executors->Type[0], executors->Type[1], str); return;
         }
         if (strcmp(name, "subseteq") == 0) {
             if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
