@@ -68,7 +68,7 @@ bool wordIsNotrestricted(char* word) {
                                "function", "domain", "codomain", "injective", "surjective", "bijective"
                                };
     int size = sizeof(restricted) / sizeof(restricted[0]);
-    for (int i = 0; i <= size; i++) {
+    for (int i = 0; i < size; i++) {
         if (strcmp(word, restricted[i]) == 0) return false;
     }
     return true;

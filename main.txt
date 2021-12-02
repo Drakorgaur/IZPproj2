@@ -1,4 +1,4 @@
-U dad mom girl boy man woman dog
+U dad mom girl boy man woman dog bijective
 S boy dad dog mom girl woman
 S boy dad dog mom girl woman
 R (boy mom) (mom boy) (boy boy) (mom mom)
