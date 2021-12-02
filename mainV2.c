@@ -113,6 +113,20 @@ void createStrArray(type* T) {
         strcpy(T->str[i], "");
     }
 }
+
+void copyType(type* newType, type* oldType) {
+    newType->header = oldType->header;
+    newType->elements_amount = oldType->elements_used;
+    newType->elements_used = oldType->elements_used;
+    newType->row = malloc(sizeof(char) * 3);
+    strcpy(newType->row, oldType->row);
+    newType->str = malloc(sizeof(char*) * newType->elements_used);
+    for (int i = 0; i < newType->elements_used; i++) {
+        newType->str[i] = malloc(sizeof(char) * MAX_SIZE);
+        strcpy(newType->str[i], oldType->str[i]);
+    }
+}
+
 //create new type
 void createType(type* T) {
     T->header = 'N'; //NONE or NULL
@@ -291,20 +305,6 @@ void selectByValue(Memory* memory, result* res, char ch) {
                 if (++res->used == res->size) resizeResult(res);
                 break;
     end
-}
-
-//create function to copy type and return it
-void copyType(type* newType, type* oldType) {
-    newType->header = oldType->header;
-    newType->elements_amount = oldType->elements_used;
-    newType->elements_used = oldType->elements_used;
-    newType->row = malloc(sizeof(char) * 3);
-    strcpy(newType->row, oldType->row);
-    newType->str = malloc(sizeof(char*) * newType->elements_used);
-    for (int i = 0; i < newType->elements_used; i++) {
-        newType->str[i] = malloc(sizeof(char) * MAX_SIZE);
-        strcpy(newType->str[i], oldType->str[i]);
-    }
 }
 
 void selectByRow(Memory* memory, type* newType, char* line) {
