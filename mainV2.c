@@ -651,11 +651,14 @@ char* surjective(type* R, type* A, type* B) {
     char elementsA[A->elements_used][31];
     strcpy(elementsA[sizeA], A->str[0]);
     sizeA++;
-    getUnique(A, elementsA, &sizeA, 1, 1);
+    getUnique(A, elementsA, &sizeA, 0, 1);
     for (int i = 0; i < sizeA; i++) {
         bool found = false;
         for (int j = 0; j < R->elements_used; j+=2) {
             if (strcmp(R->str[j], elementsA[i]) == 0) {
+                if (found) {
+                    return "false";
+                }
                 found = true;
                 break;
             }
@@ -671,7 +674,56 @@ char* surjective(type* R, type* A, type* B) {
  * TODO: test
  */
 char* bijective(type* R, type* A, type* B) {
-    return "false";
+    if (!(R->elements_used)) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    if (!(A->elements_used) || !(B->elements_used)) {
+        fprintf(stderr, "Error: empty set(s)\n");
+        return "";
+    }
+    /*
+     * TODO: create a helper
+     */
+    int sizeA = 0;
+    int sizeB = 0;
+    char elementsA[A->elements_used][31];
+    char elementsB[B->elements_used][31];
+    strcpy(elementsA[sizeA], A->str[0]);
+    strcpy(elementsB[sizeB], B->str[0]);
+    sizeA++;
+    sizeB++;
+    getUnique(A, elementsA, &sizeA, 1, 1);
+    getUnique(B, elementsB, &sizeB, 1, 1);
+    for (int i = 0; i < sizeA; i++) {
+        bool found = false;
+        for (int j = 0; j < R->elements_used; j+=2) {
+            if (strcmp(R->str[j], elementsA[i]) == 0) {
+                if (found) {
+                    return "false";
+                }
+                found = true;
+            }
+        }
+        if (!found) {
+            return "false";
+        }
+    }
+    for (int i = 0; i < sizeB; i++) {
+        bool found = false;
+        for (int j = 1; j < R->elements_used; j+=2) {
+            if (strcmp(R->str[j], elementsB[i]) == 0) {
+                if (found) {
+                    return "false";
+                }
+                found = true;
+            }
+        }
+        if (!found) {
+            return "false";
+        }
+    }
+    return "true";
 }
 
 bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
