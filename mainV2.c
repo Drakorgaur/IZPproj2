@@ -400,8 +400,8 @@ void getUnique(type* A, char elements[][31], int* size, int start, int interval)
             if (strcmp(A->str[i], "") == 0) {
                 continue;
             }
-            (*size)++;
             strcpy(elements[*size], A->str[i]);
+            (*size)++;
         }
     }
 }
@@ -524,8 +524,15 @@ char* function(type* A) {
  * TODO: DONE/test
  *
  * TODO: create error message
+ *
+ * TODO: test isFunction
  */
 void domain(type* R, char* str) {
+    char* isFunction = function(R);
+    if (strcmp(isFunction, "false") == 0) {
+        fprintf(stderr, "Error: relation is not a function\n");
+        return;
+    }
     strcpy(str, "");
     int size = 0;
     char elements[R->elements_used][31];
@@ -539,7 +546,15 @@ void domain(type* R, char* str) {
     }
 }
 
+/*
+ * TODO: test isFunction
+ */
 void codomain(type* R, char* str) {
+    char* isFunction = function(R);
+    if (strcmp(isFunction, "false") == 0) {
+        fprintf(stderr, "Error: relation is not a function\n");
+        return;
+    }
     strcpy(str, "");
     int size = 0;
     char elements[R->elements_used][31];
@@ -556,21 +571,70 @@ void codomain(type* R, char* str) {
 /*
  * TODO: test
  */
-char* injective(type* C, type* A, type* B) {
+char* injective(type* R, type* A, type* B) {
+    /*
+     * TODO: create a helper
+     */
+    int sizeA = 0, sizeB = 0;
+    char elementsA[A->elements_used][31], elementsB[B->elements_used][31];
+    strcpy(elementsA[sizeA], A->str[0]);
+    strcpy(elementsB[sizeB], B->str[0]);
+    sizeA++;
+    sizeB++;
+    getUnique(A, elementsA, &sizeA, 1, 1);
+    getUnique(B, elementsB, &sizeB, 1, 1);
+    for (int i = 0; i < R->elements_used; i+=2) {
+        bool found = false;
+        for (int j = 0; j <= sizeA; j++) {
+            if (strcmp(R->str[i], elementsA[j]) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+//            fprintf(stderr, "Error: relation must have elements on 1st place from set A\n");
+            return "Error: relation must have elements from set A";
+        }
+        for (int j = 0; j < R->elements_used; j+=2) {
+            if (j == i) continue;
+            if (strcmp(R->str[i], R->str[j]) == 0) {
+                return "false";
+            }
+        }
+    }
+    for (int i = 1; i < R->elements_used; i+=2) {
+        bool found = false;
+        for (int j = 0; j <= sizeB; j++) {
+            if (strcmp(R->str[i], elementsB[j]) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+//            fprintf(stderr, "Error: relation must have elements on 2nd place  from set B\n");
+            return "Error: relation must have elements from set B";
+        }
+        for (int j = 1; j < R->elements_used; j+=2) {
+            if (j == i) continue;
+            if (strcmp(R->str[i], R->str[j]) == 0) {
+                return "false";
+            }
+        }
+    }
+    return "true";
+}
+
+/*
+ * TODO: test
+ */
+char* surjective(type* R, type* A, type* B) {
     return "false";
 }
 
 /*
  * TODO: test
  */
-char* surjective(type* C, type* A, type* B) {
-    return "false";
-}
-
-/*
- * TODO: test
- */
-char* bijective(type* C, type* A, type* B) {
+char* bijective(type* R, type* A, type* B) {
     return "false";
 }
 
