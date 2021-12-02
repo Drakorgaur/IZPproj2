@@ -327,8 +327,21 @@ int card(type* A) {
     return A->elements_used;
 }
 
-char* complement(type* A, type* U, char* str) {
-    return "";
+void complement(type* A, type* U, char* str) {
+    strcpy(str, "");
+    for (int i = 0; i < U->elements_used; i++) {
+        bool found = false;
+        for (int j = 0; j < A->elements_used; j++) {
+            if (strcmp(A->str[j], U->str[i]) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            strcat(str, U->str[i]);
+            strcat(str, " ");
+        }
+    }
 }
 
 /*
@@ -821,7 +834,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, empty(executors->Type[0], str)); return;
+            empty(executors->Type[0], str); return;
         }
         if (strcmp(name, "card") == 0) {
             if (checkHeader(executors->Type[0], 'S')) {
@@ -837,7 +850,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, complement(executors->Type[0], U, str)); return;
+            complement(executors->Type[0], U, str); return;
         }
         if (strcmp(name, "reflexive") == 0) {
             if (checkHeader(executors->Type[0], 'R')) {

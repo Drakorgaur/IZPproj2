@@ -5,7 +5,7 @@ R (boy mom) (dad dad) (dog girl) (mom boy) (girl dog)
 R
 S dad mom
 R (dad man) (boy man) (mom woman) (girl woman)
-C empty  2
+C complement 2
 
 
 
