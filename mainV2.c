@@ -1006,10 +1006,7 @@ void executeFunction(Memory* memory) {
     char* str = malloc(sizeof(char) * (size * MAX_SIZE));
     foreachResult {
         bool commandIsValid = true;
-        Memory* executive = malloc(sizeof(Memory));
-        executive->size = DEFAULT_SIZE;
-        executive->used = 0;
-        executive->Type = malloc(sizeof(type*) * DEFAULT_SIZE);
+        Memory* executive = createMemory();
         for (int j = 0; j < executive->size; j++) {
             executive->Type[j] = malloc(sizeof(type));
             createType(executive->Type[j]);
