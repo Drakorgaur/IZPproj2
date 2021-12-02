@@ -1027,10 +1027,7 @@ void executeFunction(Memory* memory) {
             }
             copyType(executive->Type[executive->used], Type);
             if (++executive->used == executive->size) {
-                executive->size++;
-                executive->Type = realloc(executive->Type, sizeof(type*) * executive->size);
-                executive->Type[executive->used] = malloc(sizeof(type));
-                createType(executive->Type[executive->used]);
+                resizeMemory(executive);
             }
             freeType(Type);
         }
