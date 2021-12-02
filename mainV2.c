@@ -92,8 +92,20 @@ void dump(type *Type, int* cursor) {
     }
     if (Type->header != 'F') {
         printf("%c ", Type->header);
-        foreachElementInType {
-            printf("%s ", Type->str[i]);
+        if (Type->header == 'R') {
+            for (int i = 0; i < Type->elements_used; i++) {
+                if (!(i % 2)) {
+                    printf("(");
+                    printf("%s ", Type->str[i]);
+                } else {
+                    printf("%s", Type->str[i]);
+                    printf(") ");
+                }
+            }
+        } else {
+            foreachElementInType {
+                printf("%s ", Type->str[i]);
+            }
         }
     } else {
         printf("%s", Type->str[0]);
@@ -328,6 +340,7 @@ int card(type* A) {
 }
 
 void complement(type* A, type* U, char* str) {
+
     strcpy(str, "");
     for (int i = 0; i < U->elements_used; i++) {
         bool found = false;
