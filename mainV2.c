@@ -1148,19 +1148,68 @@ bool checkAndRefactorRelations(Memory* memory) {
     return true;
 }
 
-void testFunction() {
-    Memory* memory = malloc(sizeof(Memory));
-    memory->size = 1;
-    memory->used = 0;
-    memory->Type = malloc(sizeof(type) * DEFAULT_SIZE);
-    memory->Type[memory->used] = malloc(sizeof(type));
-    freeMemory(memory);
+bool checkForDuplicates(Memory* memory) {
+    result* universum = createResult();
+    selectByValue(memory, universum, 'U');
+    if (universum->used > 1) {
+        fprintf(stderr, "Universum have more than one row\n");
+        freeResult(universum);
+        return false;
+    }
+    type* U = malloc(sizeof(type));
+    selectByRow(memory, U, universum->array[0]);
+    for (int i = 0; i < U->elements_used; i++) {
+        bool duplicate = false;
+        for (int j = 0; j < U->elements_used; j++) {
+            if (strcmp(U->str[i], U->str[j]) == 0 && i != j) {
+                duplicate = true;
+                break;
+            }
+        }
+        if (duplicate) {
+            fprintf(stderr, "Universum have duplicate elements\n");
+            freeType(U);
+            freeResult(universum);
+            return false;
+        }
+    }
+    freeType(U);
+    freeResult(universum);
+//------------------------------------------------------------------------------------------------------------------
+    result* sets = createResult();
+    selectByValue(memory, sets, 'S');
+    for (int i = 0; i < sets->used; i++) {
+        type* set = malloc(sizeof(type));
+        selectByRow(memory, set, sets->array[i]);
+        for (int j = 0; j < set->elements_used; j++) {
+            bool duplicate = false;
+            for (int k = 0; k < set->elements_used; k++) {
+                if (strcmp(set->str[j], set->str[k]) == 0 && j != k) {
+                    duplicate = true;
+                    break;
+                }
+            }
+            if (duplicate) {
+                fprintf(stderr, "Set have duplicate elements\n");
+                freeType(set);
+                freeResult(sets);
+                return false;
+            }
+        }
+        freeType(set);
+    }
+    freeResult(sets);
+    return true;
 }
 
 int main(int argc, char **argv) {
     (void)argc;
     Memory *memory = createMemory();
     if (!readFromFileV2(argv[1], memory)) {
+        freeMemory(memory);
+        return 1;
+    }
+    if (!checkForDuplicates(memory)) {
         freeMemory(memory);
         return 1;
     }
@@ -1182,6 +1231,5 @@ int main(int argc, char **argv) {
     for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
     freeResult(res);
     freeMemory(memory);
-//    testFunction();
     return 0;
 }
