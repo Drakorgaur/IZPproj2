@@ -340,8 +340,7 @@ int card(type* A) {
 }
 
 void complement(type* A, type* U, char* str) {
-
-    strcpy(str, "");
+    strcpy(str, "S ");
     for (int i = 0; i < U->elements_used; i++) {
         bool found = false;
         for (int j = 0; j < A->elements_used; j++) {
@@ -361,7 +360,7 @@ void complement(type* A, type* U, char* str) {
  * TODO: test
  */
 void union_(type* A, type* B, char* str) {
-    strcpy(str, "");
+    strcpy(str, "S ");
     for (int i = 0; i < A->elements_used; i++) {
         strcat(str, A->str[i]);
         strcat(str, " ");
@@ -385,7 +384,7 @@ void union_(type* A, type* B, char* str) {
  * TODO: test
  */
 void intersect(type* A, type* B, char* str) {
-    strcpy(str, "");
+    strcpy(str, "S ");
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
@@ -400,7 +399,7 @@ void intersect(type* A, type* B, char* str) {
  * TODO: test
  */
 void minus(type* A, type* B, char* str) {
-    strcpy(str, "");
+    strcpy(str, "S ");
     for (int i = 0; i < A->elements_used; i++) {
         bool found = false;
         for (int j = 0; j < B->elements_used; j++) {
@@ -630,7 +629,7 @@ void domain(type* R, char* str) {
         fprintf(stderr, "Error: relation is not a function\n");
         return;
     }
-    strcpy(str, "");
+    strcpy(str, "S ");
     int size = 0;
     char elements[R->elements_used][31];
     getUnique(R, elements, &size, 0, 2);
@@ -653,7 +652,7 @@ void codomain(type* R, char* str) {
         strcpy(str, "");
         return;
     }
-    strcpy(str, "");
+    strcpy(str, "S ");
     int size = 0;
     char elements[R->elements_used][31];
     getUnique(R, elements, &size, 0, 2);
