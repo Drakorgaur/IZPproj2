@@ -1025,8 +1025,6 @@ void executeFunction(Memory* memory) {
             freeType(Type);
         }
         if (!commandIsValid) {
-            freeType(command);
-            freeMemory(executive);
             continue;
         }
         result* Universum = createResult();
