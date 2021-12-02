@@ -387,36 +387,39 @@ char* equals(type* A, type* B) {
  * -------------------RELATIONS-------------------
  */
 
-/*
- * TODO: test
- */
-char* reflexive(type* A) {
-    int size = 0;
-    char elements[A->elements_used][31];
-    if (A->elements_used == 0) {
-        fprintf(stderr, "Error: empty relation\n");
-        return "";
-    }
-    strcpy(elements[size], A->str[0]);
-    size++;
+void getUnique(type* A, char elements[][31], int* size) {
     for (int i = 0; i < A->elements_used; i++) {
         bool found = false;
-        for (int j = 0; j < size; j++) {
+        for (int j = 0; j < *size; j++) {
             if (strcmp(A->str[i], elements[j]) == 0) {
                 found = true;
                 break;
             }
         }
         if (!found) {
-            (size)++;
-            strcpy(elements[size], A->str[i]);
+            (*size)++;
+            strcpy(elements[*size], A->str[i]);
         }
     }
+}
+/*
+ * TODO: DONE/test
+ */
+char* reflexive(type* R) {
+    int size = 0;
+    char elements[R->elements_used][31];
+    if (!(R->elements_used)) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    strcpy(elements[size], R->str[0]);
+    size++;
+    getUnique(R, elements, &size);
     for (int j = 0; j < size; j++) {
         bool found = false;
-        for (int i = 0; i < A->elements_used; i += 2) {
-            if (strcmp(elements[j], A->str[i]) == 0) {
-                if (strcmp(elements[j], A->str[i + 1]) == 0) {
+        for (int i = 0; i < R->elements_used; i += 2) {
+            if (strcmp(elements[j], R->str[i]) == 0) {
+                if (strcmp(elements[j], R->str[i + 1]) == 0) {
                     found = true;
                     break;
                 }
@@ -433,9 +436,30 @@ char* reflexive(type* A) {
  * TODO: test
  */
 char* symmetric(type* A) {
-    for (int i = 0; i < A->elements_used; i++) {
-        for (int j = 0; j < A->elements_used; j++) {
-            if (strcmp(A->str[i], A->str[j]) != 0) return false;
+    if (!(A->elements_used)) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    for (int i = 0; i < A->elements_used; i+=2) {
+        bool found = false;
+        int k = i+1;
+        if (strcmp(A->str[i], A->str[k]) == 0) {
+            continue;
+        }
+        for (int j = 1; j < A->elements_used; j+=2) {
+            k = i+1;
+            int d = j-1;
+            printf("%s %s\n", A->str[k], A->str[d]);
+            if (strcmp(A->str[k], A->str[d]) == 0) {
+                int z = d + 1;
+                if (strcmp(A->str[z], A->str[i]) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            return "false";
         }
     }
     return "true";
@@ -445,11 +469,7 @@ char* symmetric(type* A) {
  * TODO: test
  */
 char* antisymmetric(type* A) {
-    for (int i = 0; i < A->elements_used; i++) {
-        for (int j = 0; j < A->elements_used; j++) {
-            if (strcmp(A->str[i], A->str[j]) == 0 && i != j) return false;
-        }
-    }
+
     return "true";
 }
 
@@ -591,7 +611,8 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, symmetric(executors->Type[0])); return;
+            strcpy(str, symmetric(executors->Type[0]));
+            return;
         }
         if (strcmp(name, "antisymmetric") == 0) {
             if (checkHeader(executors->Type[0], 'R')) {
