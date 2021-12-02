@@ -1,11 +1,11 @@
 U dad mom girl boy man woman dog
 S boy dad dog mom girl
-S mom dad girl boy dog
+S mom dad girl boy dog woman
 R (boy mom) (dad dad) (dog girl) (mom boy) (girl dog)
 R
 S dad mom
 R (dad man) (boy man) (mom woman) (girl woman)
-C empty 2
+C union 2 3
 
 
 

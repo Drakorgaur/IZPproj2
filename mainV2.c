@@ -347,19 +347,25 @@ void complement(type* A, type* U, char* str) {
 /*
  * TODO: test
  */
-char* union_(type* A, type* B, char* str) {
+void union_(type* A, type* B, char* str) {
+    strcpy(str, "");
     for (int i = 0; i < A->elements_used; i++) {
-        printf("%s ", A->str[i]);
+        strcat(str, A->str[i]);
+        strcat(str, " ");
     }
     for (int j = 0; j < B->elements_used; j++) {
+        bool found = false;
         for (int i = 0; i < A->elements_used; i++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
+                found = true;
                 break;
             }
         }
-        printf("%s ", B->str[j]);
+        if (!found) {
+            strcat(str, B->str[j]);
+            strcat(str, " ");
+        }
     }
-    return "";
 }
 
 /*
@@ -918,7 +924,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, union_(executors->Type[0], executors->Type[1], str)); return;
+            union_(executors->Type[0], executors->Type[1], str); return;
         }
         if (strcmp(name, "intersect") == 0) {
             if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
