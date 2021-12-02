@@ -1000,10 +1000,7 @@ void executeFunction(Memory* memory) {
     foreachResult {
         bool commandIsValid = true;
         Memory* executive = createMemory();
-        for (int j = 0; j < executive->size; j++) {
-            executive->Type[j] = malloc(sizeof(type));
-            createType(executive->Type[j]);
-        }
+
 
         type* command = malloc(sizeof(type));
         selectByRow(memory, command, commands->array[i]);
@@ -1038,7 +1035,7 @@ void executeFunction(Memory* memory) {
             if (strcmp(memory->Type[j]->row, commands->array[i]) == 0) {
                 memory->Type[j]->header = 'F';
                 for (int k = 0; k < memory->Type[j]->elements_amount; k++) {
-                    memory->Type[j]->str[k] = realloc(memory->Type[j]->str[k], sizeof(char*) * size * MAX_SIZE);
+                    memory->Type[j]->str[k] = realloc(memory->Type[j]->str[k], sizeof(char) * size * MAX_SIZE);
                 }
                 strcpy(memory->Type[j]->str[0], str);
             }
