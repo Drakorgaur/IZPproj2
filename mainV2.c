@@ -318,7 +318,7 @@ bool checkIfTypeStrEmpty(type* A) {
     return true;
 }
 
-char* empty(type* A, char* str) {
+char* empty(type* A) {
     if (A->elements_used == 0) return "true";
     return "false";
 }
@@ -834,7 +834,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            empty(executors->Type[0], str); return;
+            strcpy(str, empty(executors->Type[0])); return;
         }
         if (strcmp(name, "card") == 0) {
             if (checkHeader(executors->Type[0], 'S')) {
