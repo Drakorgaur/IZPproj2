@@ -1,12 +1,12 @@
 U dad mom girl boy man woman dog
 S boy dad dog mom girl
 S mom dad girl
-R (boy mom) (dog girl) (girl dad) (mom girl)
+R (boy mom) (dog girl) (girl dad) (mom girl) (dad girl)
 R
 C empty 2
 S dad mom
 R (dad man) (boy man) (mom woman) (girl woman)
-C injective 4 2 3
+C surjective 4 2 3
 
 
 C codomain 4

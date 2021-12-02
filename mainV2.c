@@ -572,6 +572,14 @@ void codomain(type* R, char* str) {
  * TODO: test
  */
 char* injective(type* R, type* A, type* B) {
+    if (!(R->elements_used)) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    if (!(A->elements_used) || !(B->elements_used)) {
+        fprintf(stderr, "Error: empty set(s)\n");
+        return "";
+    }
     /*
      * TODO: create a helper
      */
@@ -628,7 +636,35 @@ char* injective(type* R, type* A, type* B) {
  * TODO: test
  */
 char* surjective(type* R, type* A, type* B) {
-    return "false";
+    if (!(R->elements_used)) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    if (!(A->elements_used) || !(B->elements_used)) {
+        fprintf(stderr, "Error: empty set(s)\n");
+        return "";
+    }
+    /*
+     * TODO: create a helper
+     */
+    int sizeA = 0;
+    char elementsA[A->elements_used][31];
+    strcpy(elementsA[sizeA], A->str[0]);
+    sizeA++;
+    getUnique(A, elementsA, &sizeA, 1, 1);
+    for (int i = 0; i < sizeA; i++) {
+        bool found = false;
+        for (int j = 0; j < R->elements_used; j+=2) {
+            if (strcmp(R->str[j], elementsA[i]) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return "false";
+        }
+    }
+    return "true";
 }
 
 /*
