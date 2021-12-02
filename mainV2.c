@@ -1126,7 +1126,6 @@ void executeFunction(Memory* memory) {
 }
 
 bool checkAndRefactorRelations(Memory* memory) {
-    printf("\n");
     for (int i = 0; i < memory->used; i++) {
         if (memory->Type[i]->header == 'R') {
             if (memory->Type[i]->elements_used % 2) {
