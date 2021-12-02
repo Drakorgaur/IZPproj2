@@ -999,9 +999,13 @@ void executeFunction(Memory* memory) {
     char* str = malloc(sizeof(char) * (size * MAX_SIZE));
     foreachResult {
         bool commandIsValid = true;
-        Memory* executive = createMemory();
-
-
+        Memory* executive = malloc(sizeof(Memory));
+        executive->size = DEFAULT_SIZE;
+        executive->Type = malloc(sizeof(type*) * executive->size);
+        for (int j = 0; j < executive->size; j++) {
+            executive->Type[j] = malloc(sizeof(type));
+        }
+        executive->used = 0;
         type* command = malloc(sizeof(type));
         selectByRow(memory, command, commands->array[i]);
         for (int element = 1; element < command->elements_used; element++) {
@@ -1017,7 +1021,9 @@ void executeFunction(Memory* memory) {
             }
             copyType(executive->Type[executive->used], Type);
             if (++executive->used == executive->size) {
-                resizeMemory(executive);
+                executive->size++;
+                executive->Type = realloc(executive->Type, sizeof(type*) * memory->size);
+                executive->Type[executive->used] = malloc(sizeof(type));
             }
             freeType(Type);
         }
