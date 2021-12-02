@@ -62,6 +62,18 @@ bool typeIsValid(type* A) {
     return true;
 }
 
+bool wordIsNotrestricted(char* word) {
+    char restricted[][31] = {"true", "false", "empty", "card", "complement", "union", "intersect", "minus",
+                               "subseteq", "subset", "equals", "reflexive", "symmetric", "antisymmetric", "transitive",
+                               "function", "domain", "codomain", "injective", "surjective", "bijective"
+                               };
+    int size = sizeof(restricted) / sizeof(restricted[0]);
+    for (int i = 0; i <= size; i++) {
+        if (strcmp(word, restricted[i]) == 0) return false;
+    }
+    return true;
+}
+
 void var_dump(type *Type) {
     printf("Type: %c\n", Type->header);
     printf("Row: %s\n", Type->row);
@@ -132,10 +144,11 @@ void resizeStr(type* T) {
     T->elements_amount++;
 }
 
-void readFromFileV2(char* filename, Memory* memory) {
+bool readFromFileV2(char* filename, Memory* memory) {
     FILE* file = fopen(filename, "r");
+
     int row  = 1;
-    bool headerChecker = true;
+    bool headerChecker = true, universumCheck = false;
     char symbol, *wordBuffer;
     wordBuffer = malloc(sizeof(char) * MAX_SIZE);
     strcpy(wordBuffer, "");
@@ -148,6 +161,14 @@ void readFromFileV2(char* filename, Memory* memory) {
                     symbol = fgetc(file);
                     headerChecker = false;
                     continue;
+                }
+                if (universumCheck) {
+                    if (!wordIsNotrestricted(wordBuffer)) {
+                        fprintf(stderr, "Universum has restricted word");
+                        fclose(file);
+                        free(wordBuffer);
+                        return false;
+                    }
                 }
                 strcpy(memory->Type[memory->used]->str[memory->Type[memory->used]->elements_used], wordBuffer);
                 if (strcmp(wordBuffer, "") != 0) {
@@ -163,6 +184,14 @@ void readFromFileV2(char* filename, Memory* memory) {
                 wordSize = 0;
                 symbol = fgetc(file);
                 if (!headerChecker) {
+                    if (universumCheck) {
+                        if (!wordIsNotrestricted(wordBuffer)) {
+                            fprintf(stderr, "Universum has restricted word");
+                            fclose(file);
+                            free(wordBuffer);
+                            return false;
+                        }
+                    }
                     strcpy(memory->Type[memory->used]->str[memory->Type[memory->used]->elements_used], wordBuffer);
                     if (strcmp(wordBuffer, "") != 0)
                         memory->Type[memory->used]->elements_used++;
@@ -171,6 +200,7 @@ void readFromFileV2(char* filename, Memory* memory) {
                         resizeStr(memory->Type[memory->used]);
                 }
                 headerChecker = true;
+                universumCheck = false;
                 continue;
             }
             symbol = fgetc(file);
@@ -179,12 +209,15 @@ void readFromFileV2(char* filename, Memory* memory) {
             fclose(file);
             free(wordBuffer);
             fprintf(stderr, "Error: element couldn't have size more than 30\n");
-            exit(1);
+            return false;
         }
         if (headerChecker) {
             if (headerIsValid(symbol)) {
                 if (++memory->used == memory->size) resizeMemory(memory);
                 memory->Type[memory->used]->header = symbol;
+                if (memory->Type[memory->used]->header == 'U') {
+                    universumCheck = true;
+                }
                 sprintf(memory->Type[memory->used]->row, "%d", row);
                 continue;
             } else {
@@ -194,7 +227,7 @@ void readFromFileV2(char* filename, Memory* memory) {
                 fprintf(stderr, "Error: header is invalid\n");
                 free(wordBuffer);
                 fclose(file);
-                exit(1);
+                return false;
             }
         }
         if (valueIsValid(symbol)) strncat(wordBuffer, &symbol, 1);
@@ -202,6 +235,7 @@ void readFromFileV2(char* filename, Memory* memory) {
     }
     memory->used++;
     fclose(file); free(wordBuffer);
+    return true;
 }
 
 void freeType(type* Type) {
@@ -417,7 +451,7 @@ char* reflexive(type* R) {
     char elements[R->elements_used][31];
     strcpy(elements[size], R->str[0]);
     size++;
-    getUnique(R, elements, &size, 0, 1);
+    getUnique(R, elements, &size, 1, 1);
     for (int j = 0; j < size; j++) {
         bool found = false;
         for (int i = 0; i < R->elements_used; i += 2) {
@@ -558,7 +592,7 @@ void codomain(type* R, char* str) {
     strcpy(str, "");
     int size = 0;
     char elements[R->elements_used][31];
-    getUnique(R, elements, &size, 1, 2);
+    getUnique(R, elements, &size, 0, 2);
     for (int i = 0; i <= size; i++) {
         strcat(str, elements[i]);
         if (strcmp(elements[i], "") == 0) {
@@ -614,6 +648,9 @@ char* injective(type* R, type* A, type* B) {
         bool found = false;
         for (int j = 0; j <= sizeB; j++) {
             if (strcmp(R->str[i], elementsB[j]) == 0) {
+                if (found) {
+                    return "false";
+                }
                 found = true;
                 break;
             }
@@ -651,7 +688,7 @@ char* surjective(type* R, type* A, type* B) {
     char elementsA[A->elements_used][31];
     strcpy(elementsA[sizeA], A->str[0]);
     sizeA++;
-    getUnique(A, elementsA, &sizeA, 0, 1);
+    getUnique(A, elementsA, &sizeA, 1, 1);
     for (int i = 0; i < sizeA; i++) {
         bool found = false;
         for (int j = 0; j < R->elements_used; j+=2) {
@@ -1053,16 +1090,18 @@ bool checkAndRefactorRelations(Memory* memory) {
 
 int main(int argc, char **argv) {
     (void)argc;
-    result* res = createResult();
     Memory *memory = createMemory();
-    readFromFileV2(argv[1], memory);
-//    int cursor = 1;
-//    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
-    if (!checkAndRefactorRelations(memory)) {
-        freeResult(res);
+    if (!readFromFileV2(argv[1], memory)) {
         freeMemory(memory);
         return 1;
     }
+//    int cursor = 1;
+//    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
+    if (!checkAndRefactorRelations(memory)) {
+        freeMemory(memory);
+        return 1;
+    }
+    result* res = createResult();
     if (!checkForRelationAndSetElementsInUniversum(memory)) {
         fprintf(stderr, "ERROR: set/relation have element that is not in univesum\n");
         freeMemory(memory);
