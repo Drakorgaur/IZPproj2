@@ -987,6 +987,13 @@ int getMaxLength(Memory* memory) {
     return max;
 }
 
+void checkLeaking(Memory* executive) {
+    executive->size++;
+    executive->Type = realloc(executive->Type, sizeof(type*) * executive->size);
+    executive->Type[executive->used] = malloc(sizeof(type));
+    createType(executive->Type[executive->used]);
+}
+
 void executeFunction(Memory* memory) {
     int size = getMaxLength(memory);
 
@@ -1017,10 +1024,7 @@ void executeFunction(Memory* memory) {
             executive->Type[executive->used] = malloc(sizeof(type));
             copyType(executive->Type[executive->used], Type);
             if (++executive->used == executive->size) {
-                executive->size++;
-                executive->Type = realloc(executive->Type, sizeof(type*) * executive->size);
-                executive->Type[executive->used] = malloc(sizeof(type));
-                createType(executive->Type[executive->used]);
+                checkLeaking(executive);
             }
             freeType(Type);
         }
