@@ -1007,6 +1007,7 @@ void executeFunction(Memory* memory) {
         executive->size = 1;
         executive->used = 0;
         executive->Type = malloc(sizeof(type) * DEFAULT_SIZE);
+        executive->Type[executive->used] = malloc(sizeof(type));
 
         type* command = malloc(sizeof(type));
         selectByRow(memory, command, commands->array[i]);
@@ -1021,10 +1022,12 @@ void executeFunction(Memory* memory) {
                 commandIsValid = false;
                 break;
             }
-            executive->Type[executive->used] = malloc(sizeof(type));
             copyType(executive->Type[executive->used], Type);
             if (++executive->used == executive->size) {
-                checkLeaking(executive);
+                executive->size++;
+                executive->Type = realloc(executive->Type, sizeof(type*) * executive->size);
+                executive->Type[executive->used] = malloc(sizeof(type));
+                createType(executive->Type[executive->used]);
             }
             freeType(Type);
         }
