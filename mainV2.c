@@ -485,7 +485,7 @@ char* antisymmetric(type* A) {
 }
 
 /*
- * TODO: test
+ * TODO: NOT DONE - NEED TO CHECK AND TEST
  */
 char* transitive(type* A) {
     for (int i = 0; i < A->elements_used; i++) {
@@ -502,7 +502,19 @@ char* transitive(type* A) {
  * TODO: test
  */
 char* function(type* A) {
-    return "blabla";
+    if (!(A->elements_used)) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    for (int i = 0; i < A->elements_used; i+=2) {
+        for (int j = 0; j < A->elements_used; j+=2) {
+            if (j == i) continue;
+            if (strcmp(A->str[i], A->str[j]) == 0) {
+                return "false";
+            }
+        }
+    }
+    return "true";
 }
 
 /*

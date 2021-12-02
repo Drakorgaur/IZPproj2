@@ -1,7 +1,7 @@
-U dad mom girl boy man woman
+U dad mom girl boy man woman dog
 S
 S
-R (boy mom) (dad dad) (girl girl) (mom mom) (girl dad)
+R (boy mom) (dad dad) (dog girl) (mom mom) (girl dad)
 R
 C empty 2
 
@@ -9,7 +9,7 @@ S dad mom
 
 R (dad man) (boy man) (mom woman) (girl woman)
 
-C antisymmetric 4
+C function 4
 
 C card 2
 
