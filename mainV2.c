@@ -996,18 +996,9 @@ int getMaxLength(Memory* memory) {
     return max;
 }
 
-void checkLeaking(Memory* executive) {
-    executive->size++;
-    executive->Type = realloc(executive->Type, sizeof(type*) * executive->size);
-    executive->Type[executive->used] = malloc(sizeof(type));
-    createType(executive->Type[executive->used]);
-}
-
 void executeFunction(Memory* memory) {
     int size = getMaxLength(memory);
-
     result* commands = createResult();
-
     selectByValue(memory, commands, 'C');
     char* str = malloc(sizeof(char) * (size * MAX_SIZE));
     foreachResult {
@@ -1104,30 +1095,36 @@ bool checkAndRefactorRelations(Memory* memory) {
     return true;
 }
 
+void testFunction() {
+    Memory* memory = createMemory();
+    freeMemory(memory);
+}
+
 int main(int argc, char **argv) {
     (void)argc;
-    Memory *memory = createMemory();
-    if (!readFromFileV2(argv[1], memory)) {
-        freeMemory(memory);
-        return 1;
-    }
+//    Memory *memory = createMemory();
+//    if (!readFromFileV2(argv[1], memory)) {
+//        freeMemory(memory);
+//        return 1;
+//    }
+////    int cursor = 1;
+////    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
+//    if (!checkAndRefactorRelations(memory)) {
+//        freeMemory(memory);
+//        return 1;
+//    }
+//    result* res = createResult();
+//    if (!checkForRelationAndSetElementsInUniversum(memory)) {
+//        fprintf(stderr, "ERROR: set/relation have element that is not in univesum\n");
+//        freeMemory(memory);
+//        freeResult(res);
+//        return 1;
+//    }
+//    executeFunction(memory);
 //    int cursor = 1;
 //    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
-    if (!checkAndRefactorRelations(memory)) {
-        freeMemory(memory);
-        return 1;
-    }
-    result* res = createResult();
-    if (!checkForRelationAndSetElementsInUniversum(memory)) {
-        fprintf(stderr, "ERROR: set/relation have element that is not in univesum\n");
-        freeMemory(memory);
-        freeResult(res);
-        return 1;
-    }
-    executeFunction(memory);
-    int cursor = 1;
-    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
-    freeResult(res);
-    freeMemory(memory);
+//    freeResult(res);
+//    freeMemory(memory);
+    testFunction();
     return 0;
 }
