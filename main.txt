@@ -4,14 +4,10 @@ S
 R (boy mom) (dad dad) (dog girl) (mom mom) (girl dad)
 R
 C empty 2
-
 S dad mom
-
 R (dad man) (boy man) (mom woman) (girl woman)
-
-C function 4
-
-C card 2
+C domain 4
+C codomain 4
 
 
 

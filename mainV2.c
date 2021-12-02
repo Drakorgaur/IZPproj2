@@ -387,8 +387,8 @@ char* equals(type* A, type* B) {
  * -------------------RELATIONS-------------------
  */
 
-void getUnique(type* A, char elements[][31], int* size) {
-    for (int i = 0; i < A->elements_used; i++) {
+void getUnique(type* A, char elements[][31], int* size, int start, int interval) {
+    for (int i = start; i < A->elements_used; i+=interval) {
         bool found = false;
         for (int j = 0; j < *size; j++) {
             if (strcmp(A->str[i], elements[j]) == 0) {
@@ -397,24 +397,27 @@ void getUnique(type* A, char elements[][31], int* size) {
             }
         }
         if (!found) {
+            if (strcmp(A->str[i], "") == 0) {
+                continue;
+            }
             (*size)++;
             strcpy(elements[*size], A->str[i]);
         }
     }
 }
 /*
- * TODO: DONE/test
+ * TODO: DONE/test - test j < size to j < size + 1;
  */
 char* reflexive(type* R) {
-    int size = 0;
-    char elements[R->elements_used][31];
     if (!(R->elements_used)) {
         fprintf(stderr, "Error: empty relation\n");
         return "";
     }
+    int size = 0;
+    char elements[R->elements_used][31];
     strcpy(elements[size], R->str[0]);
     size++;
-    getUnique(R, elements, &size);
+    getUnique(R, elements, &size, 0, 1);
     for (int j = 0; j < size; j++) {
         bool found = false;
         for (int i = 0; i < R->elements_used; i += 2) {
@@ -518,14 +521,36 @@ char* function(type* A) {
 }
 
 /*
- * TODO: test
+ * TODO: DONE/test
+ *
+ * TODO: create error message
  */
-char* domain(type* A, char* str) {
-    return "false";
+void domain(type* R, char* str) {
+    strcpy(str, "");
+    int size = 0;
+    char elements[R->elements_used][31];
+    getUnique(R, elements, &size, 0, 2);
+    for (int i = 0; i <= size; i++) {
+        strcat(str, elements[i]);
+        if (strcmp(elements[i], "") == 0) {
+            continue;
+        }
+        strcat(str, " ");
+    }
 }
 
-char* codomain(type* A, char* str) {
-    return "false";
+void codomain(type* R, char* str) {
+    strcpy(str, "");
+    int size = 0;
+    char elements[R->elements_used][31];
+    getUnique(R, elements, &size, 1, 2);
+    for (int i = 0; i <= size; i++) {
+        strcat(str, elements[i]);
+        if (strcmp(elements[i], "") == 0) {
+            continue;
+        }
+        strcat(str, " ");
+    }
 }
 
 /*
@@ -667,7 +692,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, domain(executors->Type[0], str)); return;
+            domain(executors->Type[0], str); return;
         }
         if (strcmp(name, "codomain") == 0) {
             if (checkHeader(executors->Type[0], 'R')) {
@@ -675,7 +700,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, codomain(executors->Type[0], str)); return;
+            codomain(executors->Type[0], str); return;
         }
     }
 
