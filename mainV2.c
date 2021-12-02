@@ -442,17 +442,12 @@ char* symmetric(type* A) {
     }
     for (int i = 0; i < A->elements_used; i+=2) {
         bool found = false;
-        int k = i+1;
-        if (strcmp(A->str[i], A->str[k]) == 0) {
+        if (strcmp(A->str[i], A->str[i+1]) == 0) {
             continue;
         }
         for (int j = 1; j < A->elements_used; j+=2) {
-            k = i+1;
-            int d = j-1;
-            printf("%s %s\n", A->str[k], A->str[d]);
-            if (strcmp(A->str[k], A->str[d]) == 0) {
-                int z = d + 1;
-                if (strcmp(A->str[z], A->str[i]) == 0) {
+            if (strcmp(A->str[i+1], A->str[j-1]) == 0) {
+                if (strcmp(A->str[j], A->str[i]) == 0) {
                     found = true;
                     break;
                 }
@@ -469,7 +464,23 @@ char* symmetric(type* A) {
  * TODO: test
  */
 char* antisymmetric(type* A) {
-
+    if (!(A->elements_used)) {
+        fprintf(stderr, "Error: empty relation\n");
+        return "";
+    }
+    for (int i = 0; i < A->elements_used; i+=2) {
+        bool found = false;
+        if (strcmp(A->str[i], A->str[i+1]) == 0) {
+            continue;
+        }
+        for (int j = 1; j < A->elements_used; j+=2) {
+            if (strcmp(A->str[i+1], A->str[j-1]) == 0) {
+                if (strcmp(A->str[j], A->str[i]) == 0) {
+                    return "false";
+                }
+            }
+        }
+    }
     return "true";
 }
 
