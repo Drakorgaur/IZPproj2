@@ -410,7 +410,7 @@ void minus(type* A, type* B, char* str) {
             }
         }
         if (!found) {
-            strcpy(str, A->str[i]);
+            strcat(str, A->str[i]);
             strcat(str, " ");
         }
     }
