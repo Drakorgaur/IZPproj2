@@ -371,18 +371,18 @@ void union_(type* A, type* B, char* str) {
 /*
  * TODO: test
  */
-char* intersect(type* A, type* B, char* str) {
+void intersect(type* A, type* B, char* str) {
+    strcpy(str, "");
     for (int i = 0; i < A->elements_used; i++) {
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
-                printf("%s ", A->str[i]);
+                strcat(str, A->str[i]);
+                strcat(str, " ");
                 break;
             }
         }
     }
-    return "";
 }
-
 /*
  * TODO: test
  */
@@ -932,7 +932,7 @@ void callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
                 strcpy(str, "FAIL\n");
                 return;
             }
-            strcpy(str, intersect(executors->Type[0], executors->Type[1], str)); return;
+            intersect(executors->Type[0], executors->Type[1], str); return;
         }
         if (strcmp(name, "minus") == 0) {
             if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
@@ -1048,6 +1048,12 @@ void executeFunction(Memory* memory) {
         }
         if (!commandIsValid) {
             freeType(command);
+
+            executive->Type[executive->used]->row = malloc(sizeof(char) * 3);
+            executive->Type[executive->used]->str = malloc(sizeof(char*) * executive->Type[executive->used]->elements_used);
+            for (int j = 0; j < executive->Type[executive->used]->elements_used; j++) {
+                executive->Type[executive->used]->str[j] = malloc(sizeof(char) * MAX_SIZE);
+            }
             freeMemory(executive);
             continue;
         }
@@ -1068,6 +1074,12 @@ void executeFunction(Memory* memory) {
         freeType(U);
         freeType(command);
         freeResult(Universum);
+
+        executive->Type[executive->used]->row = malloc(sizeof(char) * 3);
+        executive->Type[executive->used]->str = malloc(sizeof(char*) * executive->Type[executive->used]->elements_used);
+        for (int j = 0; j < executive->Type[executive->used]->elements_used; j++) {
+            executive->Type[executive->used]->str[j] = malloc(sizeof(char) * MAX_SIZE);
+        }
         freeMemory(executive);
     }
     free(str);
