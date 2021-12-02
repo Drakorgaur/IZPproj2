@@ -1096,35 +1096,39 @@ bool checkAndRefactorRelations(Memory* memory) {
 }
 
 void testFunction() {
-    Memory* memory = createMemory();
+    Memory* memory = malloc(sizeof(Memory));
+    memory->size = 1;
+    memory->used = 0;
+    memory->Type = malloc(sizeof(type) * DEFAULT_SIZE);
+    memory->Type[memory->used] = malloc(sizeof(type));
     freeMemory(memory);
 }
 
 int main(int argc, char **argv) {
     (void)argc;
-//    Memory *memory = createMemory();
-//    if (!readFromFileV2(argv[1], memory)) {
-//        freeMemory(memory);
-//        return 1;
-//    }
-////    int cursor = 1;
-////    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
-//    if (!checkAndRefactorRelations(memory)) {
-//        freeMemory(memory);
-//        return 1;
-//    }
-//    result* res = createResult();
-//    if (!checkForRelationAndSetElementsInUniversum(memory)) {
-//        fprintf(stderr, "ERROR: set/relation have element that is not in univesum\n");
-//        freeMemory(memory);
-//        freeResult(res);
-//        return 1;
-//    }
-//    executeFunction(memory);
+    Memory *memory = createMemory();
+    if (!readFromFileV2(argv[1], memory)) {
+        freeMemory(memory);
+        return 1;
+    }
 //    int cursor = 1;
 //    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
-//    freeResult(res);
-//    freeMemory(memory);
-    testFunction();
+    if (!checkAndRefactorRelations(memory)) {
+        freeMemory(memory);
+        return 1;
+    }
+    result* res = createResult();
+    if (!checkForRelationAndSetElementsInUniversum(memory)) {
+        fprintf(stderr, "ERROR: set/relation have element that is not in univesum\n");
+        freeMemory(memory);
+        freeResult(res);
+        return 1;
+    }
+    executeFunction(memory);
+    int cursor = 1;
+    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
+    freeResult(res);
+    freeMemory(memory);
+//    testFunction();
     return 0;
 }
