@@ -408,11 +408,14 @@ void minus(type* A, type* B, char* str) {
  */
 char* subseteq(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
+        bool found = false;
         for (int j = 0; j < B->elements_used; j++) {
             if (strcmp(A->str[i], B->str[j]) == 0) {
+                found = true;
                 break;
             }
         }
+        if (!found) return "false";
     }
     return "true";
 }
