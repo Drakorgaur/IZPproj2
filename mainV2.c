@@ -106,6 +106,9 @@ void createRow(type* T) {
 }
 void createStr(type* T) {
     T->str = malloc(sizeof(char*) * DEFAULT_SIZE);
+    for (int i = 0; i < DEFAULT_SIZE; i++) {
+        T->str[i] = malloc(sizeof(char) * DEFAULT_SIZE);
+    }
 }
 void createStrArray(type* T) {
     for (int i = 0; i < DEFAULT_SIZE; i++) {
