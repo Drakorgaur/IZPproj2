@@ -650,6 +650,7 @@ void codomain(type* R, char* str) {
     char* isFunction = function(R);
     if (strcmp(isFunction, "false") == 0) {
         fprintf(stderr, "Error: relation is not a function\n");
+        strcpy(str, "");
         return;
     }
     strcpy(str, "");
