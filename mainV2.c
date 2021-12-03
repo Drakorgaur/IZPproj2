@@ -628,11 +628,6 @@ void domain(type* R, char* str) {
         fprintf(stderr, "Error: empty relation\n");
         return;
     }
-    char* isFunction = function(R);
-    if (strcmp(isFunction, "false") == 0) {
-        fprintf(stderr, "Error: relation is not a function\n");
-        return;
-    }
     strcpy(str, "S ");
     int size = 0;
     char elements[R->elements_used][31];
@@ -652,12 +647,6 @@ void domain(type* R, char* str) {
 void codomain(type* R, char* str) {
     if (!(R->elements_used)) {
         fprintf(stderr, "Error: empty relation\n");
-        return;
-    }
-    char* isFunction = function(R);
-    if (strcmp(isFunction, "false") == 0) {
-        fprintf(stderr, "Error: relation is not a function\n");
-        strcpy(str, "");
         return;
     }
     strcpy(str, "S ");
@@ -1264,7 +1253,7 @@ int main(int argc, char **argv) {
     }
     result* res = createResult();
     if (!checkForRelationAndSetElementsInUniversum(memory)) {
-        fprintf(stderr, "ERROR: set/relation have element that is not in univesum\n");
+        fprintf(stderr, "ERROR: set/relation have element that is not in universum\n");
         freeMemory(memory);
         freeResult(res);
         return 1;
