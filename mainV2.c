@@ -114,8 +114,6 @@ void dump(type *Type, int* cursor) {
         }
     } else {
         printf("%s ", Type->str[0]);
-        printf("\n%s ", Type->str[0]);
-        printf("\n%s ", Type->str[0]);
     }
     *cursor = atoi(Type->row);
 }
@@ -648,7 +646,7 @@ void domain(type* R, char* str) {
     int size = 0;
     char elements[R->elements_used][31];
     getUnique(R, elements, &size, 0, 2);
-    for (int i = 0; i <= size; i++) {
+    for (int i = 0; i < size; i++) {
         strcat(str, elements[i]);
         if (strcmp(elements[i], "") == 0) {
             continue;
