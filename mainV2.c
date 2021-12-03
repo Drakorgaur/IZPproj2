@@ -95,7 +95,7 @@ void var_dump(type *Type) {
 
 void dump(type *Type, int* cursor) {
     for (int i = *cursor; i < atoi(Type->row); i++) {
-        printf("\n");
+        printf(" \n");
     }
     if (Type->header != 'F') {
         printf("%c ", Type->header);
