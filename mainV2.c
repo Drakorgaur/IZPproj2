@@ -51,8 +51,15 @@ bool headerIsValid(char header) {
 
 bool valueIsValid(char value)
 {
-    if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9')
+    if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z')
     || (value == '(' || value == ')')) return true;
+    return false;
+}
+
+bool commandValueIsValid(char value)
+{
+    if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9')
+        || (value == '(' || value == ')')) return true;
     return false;
 }
 
@@ -177,7 +184,10 @@ void resizeStr(type* T) {
 
 bool readFromFileV2(char* filename, Memory* memory) {
     FILE* file = fopen(filename, "r");
-
+    if (file == NULL) {
+        fprintf(stderr, "Failed: to open file %s\n", filename);
+        return false;
+    }
     int row  = 1;
     bool headerChecker = true, universumCheck = false;
     char symbol, *wordBuffer;
@@ -236,7 +246,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
             }
             symbol = fgetc(file);
         }
-        if (wordSize == MAX_SIZE) {
+        if (wordSize == MAX_SIZE - 1) {
             fclose(file);
             free(wordBuffer);
             fprintf(stderr, "Error: element couldn't have size more than 30\n");
@@ -261,7 +271,23 @@ bool readFromFileV2(char* filename, Memory* memory) {
                 return false;
             }
         }
-        if (valueIsValid(symbol)) strncat(wordBuffer, &symbol, 1);
+        if (memory->Type[memory->used]->header == 'C') {
+            if (commandValueIsValid(symbol)) {
+                strncat(wordBuffer, &symbol, 1);
+            } else {
+                printf("element %c on line %s has restricted symbol\n", memory->Type[memory->used]->header, memory->Type[memory->used]->row);
+                fclose(file); free(wordBuffer);
+                return false;
+            }
+        } else {
+            if (valueIsValid(symbol)) {
+                strncat(wordBuffer, &symbol, 1);
+            } else {
+                printf("element %c on line %s has restricted symbol\n", memory->Type[memory->used]->header, memory->Type[memory->used]->row);
+                fclose(file); free(wordBuffer);
+                return false;
+            }
+        }
         headerChecker = false;
     }
     memory->used++;
@@ -1236,6 +1262,14 @@ bool checkForDuplicates(Memory* memory) {
 
 int main(int argc, char **argv) {
     (void)argc;
+    if (argv[1] == NULL) {
+        fprintf(stderr, "No file name\n");
+        return 1;
+    }
+    if (argv[2] != NULL) {
+        fprintf(stderr, "Too much program argumetns\n");
+        return 1;
+    }
     Memory *memory = createMemory();
     if (!readFromFileV2(argv[1], memory)) {
         freeMemory(memory);
