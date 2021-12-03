@@ -662,7 +662,7 @@ void codomain(type* R, char* str) {
     strcpy(str, "S ");
     int size = 0;
     char elements[R->elements_used][31];
-    getUnique(R, elements, &size, 0, 2);
+    getUnique(R, elements, &size, 1, 2);
     for (int i = 0; i < size; i++) {
         strcat(str, elements[i]);
         if (strcmp(elements[i], "") == 0) {
