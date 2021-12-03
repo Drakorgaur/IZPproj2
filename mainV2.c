@@ -332,18 +332,20 @@ void resizeResult(result* res) {
 }
 
 void selectByValue(Memory* memory, result* res, char ch) {
-    SELECT_FROM_TYPES WHERE VALUE(ch)
-                strcpy(res->array[res->used], TYPE[i]->row);
-                if (++res->used == res->size) resizeResult(res);
-                break;
-    end
+    for (int i = 0; i < memory->used; i++) {
+        if (memory->Type[i]->header == ch) {
+            strcpy(res->array[res->used], memory->Type[i]->row);
+            if (++res->used == res->size) resizeResult(res);
+            break;
+        }
+    }
 }
 
 void selectByRow(Memory* memory, type* newType, char* line) {
     for (int i = 0; i < memory->used; i++) {
         if (strcmp(memory->Type[i]->row, line) == 0) {
             if (memory->Type[i]->elements_used >= 0) {
-                copyType(newType, TYPE[i]);
+                copyType(newType, memory->Type[i]);
             } else {
                 newType->header = memory->Type[i]->header; // NONE
                 newType->elements_amount = DEFAULT_SIZE;
