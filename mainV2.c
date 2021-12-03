@@ -726,6 +726,9 @@ char* injective(type* R, type* A, type* B) {
  * TODO: test
  */
 char* surjective(type* R, type* A, type* B) {
+    if (B->header != 'S') {
+        return "false";
+    }
     /*
      * TODO: create a helper
      */
