@@ -275,7 +275,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
             if (commandValueIsValid(symbol)) {
                 strncat(wordBuffer, &symbol, 1);
             } else {
-                printf("element %c on line %s has restricted symbol\n", memory->Type[memory->used]->header, memory->Type[memory->used]->row);
+                fprintf(stderr,"element %c on line %s has restricted symbol\n", memory->Type[memory->used]->header, memory->Type[memory->used]->row);
                 fclose(file); free(wordBuffer);
                 return false;
             }
@@ -283,7 +283,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
             if (valueIsValid(symbol)) {
                 strncat(wordBuffer, &symbol, 1);
             } else {
-                printf("element %c on line %s has restricted symbol\n", memory->Type[memory->used]->header, memory->Type[memory->used]->row);
+                fprintf(stderr,"element %c on line %s has restricted symbol\n", memory->Type[memory->used]->header, memory->Type[memory->used]->row);
                 fclose(file); free(wordBuffer);
                 return false;
             }
@@ -583,7 +583,6 @@ char* antisymmetric(type* A) {
         return "";
     }
     for (int i = 0; i < A->elements_used; i+=2) {
-        bool found = false;
         if (strcmp(A->str[i], A->str[i+1]) == 0) {
             continue;
         }
@@ -892,14 +891,7 @@ bool checkHeader(type* A, char header) {
 }
 
 bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
-    int A = 0;
-    int B = 1;
-    int C = 2;
     if (executors->used == 1) {
-        if (executors->Type[0]->elements_used == 0) {
-            fprintf(stderr, "Error: empty set/relation\n");
-            return false;
-        }
         if (strcmp(name, "empty") == 0) {
             if (checkHeader(executors->Type[0], 'S')) {
                 fprintf(stderr, "Error: empty() can be used only with sets\n");
@@ -1035,10 +1027,6 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     }
 
     if (executors->used == 3) {
-        if (executors->Type[0]->elements_used == 0 && executors->Type[1]->elements_used == 0 && executors->Type[2]->elements_used == 0) {
-            fprintf(stderr, "Error: empty set/relation\n");
-            return false;
-        }
         if (strcmp(name, "injective") == 0)
         {
             if (checkHeader(executors->Type[0], 'R') && checkHeader(executors->Type[1], 'S')
