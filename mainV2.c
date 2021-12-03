@@ -376,6 +376,9 @@ int card(type* A) {
 
 void complement(type* A, type* U, char* str) {
     strcpy(str, "S ");
+    if (A->header == 'U') {
+        return;
+    }
     for (int i = 0; i < U->elements_used; i++) {
         bool found = false;
         for (int j = 0; j < A->elements_used; j++) {
@@ -865,7 +868,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, empty(executors->Type[0])); return true;
         }
         if (strcmp(name, "card") == 0) {
-            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[0], 'U')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') && headerIsNotEqual(executors->Type[0], 'U')) {
                 fprintf(stderr, "Error: card() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -873,8 +876,8 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             sprintf(str, "%d", card(executors->Type[0])); return true;
         }
         if (strcmp(name, "complement") == 0) {
-            if (headerIsNotEqual(executors->Type[0], 'S')) {
-                fprintf(stderr, "Error: complement() can be used only with sets\n");
+            if (headerIsNotEqual(executors->Type[0], 'S') && headerIsNotEqual(executors->Type[0], 'U')) {
+                fprintf(stderr, "Error: complement() can be used only with sets and universium\n");
                 strcpy(str, "FAIL\n");
                 return false;
             }
