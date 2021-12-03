@@ -110,6 +110,8 @@ void dump(type *Type, int* cursor) {
         } else {
             foreachElementInType {
                 printf("%s ", Type->str[i]);
+                printf("\n%s ", Type->str[i]);
+                printf("\n%s ", Type->str[i]);
             }
         }
     } else {
