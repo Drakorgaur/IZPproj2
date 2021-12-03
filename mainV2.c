@@ -860,7 +860,7 @@ bool headerIsNotEqual(type* A, char header) {
 bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     if (executors->used == 1) {
         if (strcmp(name, "empty") == 0) {
-            if (headerIsNotEqual(executors->Type[0], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') && headerIsNotEqual(executors->Type[0], 'U')) {
                 fprintf(stderr, "Error: empty() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
