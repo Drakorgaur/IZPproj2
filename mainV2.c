@@ -15,7 +15,6 @@ typedef unsigned short bool;
 #define VALUE(a) if (TYPE[i]->header == (a)) {
 #define end }}}
 #define TYPE memory->Type
-#define EMPTY 'E'
 
 typedef struct {
     /*
@@ -63,7 +62,7 @@ bool commandValueIsValid(char value)
 }
 
 bool typeIsValid(type* A) {
-    if (A->header == 'E' && A->elements_used < 0) return false;
+    if (A->header == 'E' && A->elements_used <  0 ) return false;
     return true;
 }
 
@@ -79,23 +78,11 @@ bool wordIsNotrestricted(char* word) {
     return true;
 }
 
-void var_dump(type *Type) {
-    printf("Type: %c\n", Type->header);
-    printf("Row: %s\n", Type->row);
-    printf("Elements amount: %d\n", Type->elements_amount);
-    printf("Elements used: %d\n", Type->elements_used);
-    printf("Str: ");
-    foreachElementInType {
-        printf("%s ", Type->str[i]);
-    }
-    printf("\n\n");
-}
-
 void dump(type *Type, int* cursor) {
     for (int i = *cursor; i < atoi(Type->row); i++) {
         printf(" \n");
     }
-    if (Type->header != 'F') {
+    if (Type->header != 'F') {  // C -> F
         printf("%c ", Type->header);
         if (Type->header == 'R') {
             for (int i = 0; i < Type->elements_used; i++) {
@@ -191,7 +178,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
     char symbol, *wordBuffer;
     wordBuffer = malloc(sizeof(char) * MAX_SIZE);
     strcpy(wordBuffer, "");
-    memory->used = -1;
+    memory->used = -1;  //
     for (int wordSize = 0; !feof(file); wordSize++) {
         symbol = fgetc(file);
         while (symbol == ' ' || symbol == '\n') {
@@ -214,7 +201,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
                     memory->Type[memory->used]->elements_used++;
                 }
                 strcpy(wordBuffer, "");
-                if (memory->Type[memory->used]->elements_used == memory->Type[memory->used]->elements_amount)
+                if (memory->Type[memory->used]->elements_used == memory->Type[memory->used]->elements_amount) //str[2][31] -> resize
                     resizeStr(memory->Type[memory->used]);
                 wordSize = 0;
             }
@@ -341,8 +328,10 @@ void selectByValue(Memory* memory, result* res, char ch) {
 }
 
 void selectByRow(Memory* memory, type* newType, char* line) {
+    bool found = false;
     for (int i = 0; i < memory->used; i++) {
         if (strcmp(memory->Type[i]->row, line) == 0) {
+            found = true;
             if (memory->Type[i]->elements_used >= 0) {
                 copyType(newType, memory->Type[i]);
             } else {
@@ -356,13 +345,14 @@ void selectByRow(Memory* memory, type* newType, char* line) {
             }
         }
     }
-}
-
-bool checkIfTypeStrEmpty(type* A) {
-    for (int i = 0; i < A->elements_amount; i++) {
-        if (strcmp(A->str[i], "") != 0) return false;
+    if (!found) {
+        newType->elements_amount = DEFAULT_SIZE;
+        newType->str = malloc(sizeof(char*) * newType->elements_amount);
+        for (int j = 0; j < newType->elements_amount; j++) {
+            newType->str[j] = malloc(sizeof(char) * MAX_SIZE);
+        }
+        newType->row = malloc(sizeof(char) * MAX_SIZE);
     }
-    return true;
 }
 
 char* empty(type* A) {
@@ -1053,7 +1043,6 @@ bool executeFunction(Memory* memory) {
     selectByValue(memory, commands, 'C');
     char* str = malloc(sizeof(char) * (size * MAX_SIZE));
     foreachResult {
-        bool commandIsValid = true;
         Memory* executive = malloc(sizeof(Memory));
         executive->size = DEFAULT_SIZE;
         executive->Type = malloc(sizeof(type*) * executive->size);
@@ -1072,7 +1061,15 @@ bool executeFunction(Memory* memory) {
                 printf("[ERROR] while executing command on %s row\nSet / Relation / Universum are blank or do "
                        "not exist\n\n", command->row);
                 free(Type);
-                commandIsValid = false;
+                for (int j = 0; j < executive->size; j++) {
+                    free(executive->Type[j]);
+                }
+                free(executive->Type);
+                free(executive);
+                free(str);
+                freeResult(commands);
+                freeType(command);
+                return false;
                 break;
             }
             copyType(executive->Type[executive->used], Type);
@@ -1082,11 +1079,6 @@ bool executeFunction(Memory* memory) {
                 executive->Type[executive->used] = malloc(sizeof(type));
             }
             freeType(Type);
-        }
-        if (!commandIsValid) {
-            freeType(command);
-            freeMemory(executive);
-            continue;
         }
         result* Universum = createResult();
         selectByValue(memory, Universum, 'U');
@@ -1259,8 +1251,6 @@ int main(int argc, char **argv) {
         freeMemory(memory);
         return 1;
     }
-//    int cursor = 1;
-//    for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
     if (!checkAndRefactorRelations(memory)) {
         freeMemory(memory);
         return 1;
