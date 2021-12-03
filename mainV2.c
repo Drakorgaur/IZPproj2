@@ -336,7 +336,6 @@ void selectByValue(Memory* memory, result* res, char ch) {
         if (memory->Type[i]->header == ch) {
             strcpy(res->array[res->used], memory->Type[i]->row);
             if (++res->used == res->size) resizeResult(res);
-            break;
         }
     }
 }
@@ -866,7 +865,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, empty(executors->Type[0])); return true;
         }
         if (strcmp(name, "card") == 0) {
-            if (checkHeader(executors->Type[0], 'S')) {
+            if (checkHeader(executors->Type[0], 'S') || checkHeader(executors->Type[0], 'U')) {
                 fprintf(stderr, "Error: card() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
