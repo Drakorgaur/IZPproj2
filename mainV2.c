@@ -1140,7 +1140,9 @@ bool hasDuplicateRelation(Memory* memory) {
                 }
             }
         }
+        freeType(relation);
     }
+    freeResult(relations);
     return true;
 }
 
