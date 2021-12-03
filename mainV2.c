@@ -1171,6 +1171,31 @@ bool executeFunction(Memory* memory) {
     return true;
 }
 
+bool hasDuplicateRelation(Memory* memory) {
+    result * relations = createResult();
+    selectByValue(memory, relations, 'R');
+    for (int i = 0; i < relations->used; i++) {
+        type * relation = malloc(sizeof(type));
+        selectByRow(memory, relation, relations->array[i]);
+        for (int j = 0; j < relation->elements_used; j+=2) {
+            for (int k = 0; k < relation->elements_used; k+=2) {
+                if (j == k) {
+                    continue;
+                }
+                if (strcmp(relation->str[j], relation->str[k]) == 0) {
+                    if (strcmp(relation->str[j + 1], relation->str[k + 1]) == 0) {
+                        fprintf(stderr, "Relation has duplacates");
+                        freeType(relation);
+                        freeResult(relations);
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
 bool checkAndRefactorRelations(Memory* memory) {
     for (int i = 0; i < memory->used; i++) {
         if (memory->Type[i]->header == 'R') {
@@ -1202,6 +1227,9 @@ bool checkAndRefactorRelations(Memory* memory) {
                 return false;
             }
         }
+    }
+    if (!hasDuplicateRelation(memory)) {
+        return false;
     }
     return true;
 }
