@@ -1,13 +1,3 @@
-U dad mom girl boy man woman dog
-S boy dad dog mom girl woman
-S boy dad dog mom girl woman
-R (boy mom) (mom boy) (boy boy) (mom mom)
+U
 R
-S dad mom
-R (dad man) (boy man) (mom woman) (girl woman)
-C transitive 4
-
-
-
-
-
+C domain 2
