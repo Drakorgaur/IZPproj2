@@ -849,7 +849,7 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     return true;
 }
 
-bool checkHeader(type* A, char header) {
+bool headerIsNotEqual(type* A, char header) {
     if (A->header == header) return false;
     return true;
 }
@@ -857,7 +857,7 @@ bool checkHeader(type* A, char header) {
 bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     if (executors->used == 1) {
         if (strcmp(name, "empty") == 0) {
-            if (checkHeader(executors->Type[0], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S')) {
                 fprintf(stderr, "Error: empty() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -865,7 +865,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, empty(executors->Type[0])); return true;
         }
         if (strcmp(name, "card") == 0) {
-            if (checkHeader(executors->Type[0], 'S') || checkHeader(executors->Type[0], 'U')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[0], 'U')) {
                 fprintf(stderr, "Error: card() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -873,7 +873,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             sprintf(str, "%d", card(executors->Type[0])); return true;
         }
         if (strcmp(name, "complement") == 0) {
-            if (checkHeader(executors->Type[0], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S')) {
                 fprintf(stderr, "Error: complement() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -881,7 +881,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             complement(executors->Type[0], U, str); return true;
         }
         if (strcmp(name, "reflexive") == 0) {
-            if (checkHeader(executors->Type[0], 'R')) {
+            if (headerIsNotEqual(executors->Type[0], 'R')) {
                 fprintf(stderr, "Error: reflexive() can be used only with relations\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -889,7 +889,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, reflexive(executors->Type[0])); return true;
         }
         if (strcmp(name, "symmetric") == 0) {
-            if (checkHeader(executors->Type[0], 'R')) {
+            if (headerIsNotEqual(executors->Type[0], 'R')) {
                 fprintf(stderr, "Error: symmetric() can be used only with relations\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -898,7 +898,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             return true;
         }
         if (strcmp(name, "antisymmetric") == 0) {
-            if (checkHeader(executors->Type[0], 'R')) {
+            if (headerIsNotEqual(executors->Type[0], 'R')) {
                 fprintf(stderr, "Error: antisymmetric() can be used only with relations\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -906,7 +906,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, antisymmetric(executors->Type[0])); return true;
         }
         if (strcmp(name, "transitive") == 0) {
-            if (checkHeader(executors->Type[0], 'R')) {
+            if (headerIsNotEqual(executors->Type[0], 'R')) {
                 fprintf(stderr, "Error: transitive() can be used only with relations\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -914,7 +914,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, transitive(executors->Type[0])); return true;
         }
         if (strcmp(name, "function") == 0) {
-            if (checkHeader(executors->Type[0], 'R')) {
+            if (headerIsNotEqual(executors->Type[0], 'R')) {
                 fprintf(stderr, "Error: function() can be used only with relations\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -922,7 +922,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, function(executors->Type[0])); return true;
         }
         if (strcmp(name, "domain") == 0) {
-            if (checkHeader(executors->Type[0], 'R')) {
+            if (headerIsNotEqual(executors->Type[0], 'R')) {
                 fprintf(stderr, "Error: domain() can be used only with relations\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -930,7 +930,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             domain(executors->Type[0], str); return true;
         }
         if (strcmp(name, "codomain") == 0) {
-            if (checkHeader(executors->Type[0], 'R')) {
+            if (headerIsNotEqual(executors->Type[0], 'R')) {
                 fprintf(stderr, "Error: codomain() can be used only with relations\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -941,7 +941,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
 
     if (executors->used == 2) {
         if (strcmp(name, "union") == 0) {
-            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[1], 'S')) {
                 fprintf(stderr, "Error: union() can be used only with sets");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -949,7 +949,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             union_(executors->Type[0], executors->Type[1], str); return true;
         }
         if (strcmp(name, "intersect") == 0) {
-            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[1], 'S')) {
                 fprintf(stderr, "Error: intersect() can be used only with sets");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -957,7 +957,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             intersect(executors->Type[0], executors->Type[1], str); return true;
         }
         if (strcmp(name, "minus") == 0) {
-            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[1], 'S')) {
                 fprintf(stderr, "Error: minus() can be used only with sets");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -965,7 +965,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             minus(executors->Type[0], executors->Type[1], str); return true;
         }
         if (strcmp(name, "subseteq") == 0) {
-            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[1], 'S')) {
                 fprintf(stderr, "Error: subseteq() can be used only with sets");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -973,7 +973,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, subseteq(executors->Type[0], executors->Type[1])); return true;
         }
         if (strcmp(name, "subset") == 0) {
-            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[1], 'S')) {
                 fprintf(stderr, "Error: subset() can be used only with sets");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -981,7 +981,7 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, subset(executors->Type[0], executors->Type[1])); return true;
         }
         if (strcmp(name, "equals") == 0) {
-            if (checkHeader(executors->Type[0], 'S') && checkHeader(executors->Type[1], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'S') || headerIsNotEqual(executors->Type[1], 'S')) {
                 fprintf(stderr, "Error: equals() can be used only with sets");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -993,8 +993,8 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     if (executors->used == 3) {
         if (strcmp(name, "injective") == 0)
         {
-            if (checkHeader(executors->Type[0], 'R') && checkHeader(executors->Type[1], 'S')
-                                                                    && checkHeader(executors->Type[2], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'R') || headerIsNotEqual(executors->Type[1], 'S')
+                || headerIsNotEqual(executors->Type[2], 'S')) {
                 fprintf(stderr, "Error: equals() can be used only with R S S format");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -1002,8 +1002,8 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, injective(executors->Type[0], executors->Type[1], executors->Type[2])); return true;
         }
         if (strcmp(name, "surjective") == 0) {
-            if (checkHeader(executors->Type[0], 'R') && checkHeader(executors->Type[1], 'S')
-                                                                    && checkHeader(executors->Type[2], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'R') || headerIsNotEqual(executors->Type[1], 'S')
+                || headerIsNotEqual(executors->Type[2], 'S')) {
                 fprintf(stderr, "Error: equals() can be used only with R S S format");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -1012,8 +1012,8 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             return true;
         }
         if (strcmp(name, "bijective") == 0) {
-            if (checkHeader(executors->Type[0], 'R') && checkHeader(executors->Type[1], 'S')
-                                                                    && checkHeader(executors->Type[2], 'S')) {
+            if (headerIsNotEqual(executors->Type[0], 'R') || headerIsNotEqual(executors->Type[1], 'S')
+                || headerIsNotEqual(executors->Type[2], 'S')) {
                 fprintf(stderr, "Error: equals() can be used only with R S S format");
                 strcpy(str, "FAIL\n");
                 return false;
