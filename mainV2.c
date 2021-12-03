@@ -1243,5 +1243,6 @@ int main(int argc, char **argv) {
     for (int i = 0; i < memory->used; i++) dump(memory->Type[i], &cursor);
     freeResult(res);
     freeMemory(memory);
+    printf("\n");
     return 0;
 }
