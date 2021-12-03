@@ -23,7 +23,6 @@ typedef struct {
      */
     char header;
     char* row;
-    int row_length;
     char** str;
     int elements_amount;
     int elements_used;
@@ -64,8 +63,7 @@ bool commandValueIsValid(char value)
 }
 
 bool typeIsValid(type* A) {
-    if (A->header == 'E') return false;
-    if (A->elements_used < 0) return false;
+    if (A->header == 'E' && A->elements_used < 0) return false;
     return true;
 }
 
@@ -344,7 +342,17 @@ void selectByValue(Memory* memory, result* res, char ch) {
 void selectByRow(Memory* memory, type* newType, char* line) {
     for (int i = 0; i < memory->used; i++) {
         if (strcmp(memory->Type[i]->row, line) == 0) {
-            copyType(newType, TYPE[i]);
+            if (memory->Type[i]->elements_used >= 0) {
+                copyType(newType, TYPE[i]);
+            } else {
+                newType->header = memory->Type[i]->header; // NONE
+                newType->elements_amount = DEFAULT_SIZE;
+                newType->str = malloc(sizeof(char*) * newType->elements_amount);
+                for (int j = 0; j < newType->elements_amount; j++) {
+                    newType->str[j] = malloc(sizeof(char) * MAX_SIZE);
+                }
+                newType->row = malloc(sizeof(char) * MAX_SIZE);
+            }
         }
     }
 }
@@ -1049,6 +1057,7 @@ bool executeFunction(Memory* memory) {
             executive->Type[j] = malloc(sizeof(type));
         }
         executive->used = 0;
+
         type* command = malloc(sizeof(type));
         selectByRow(memory, command, commands->array[i]);
         for (int element = 1; element < command->elements_used; element++) {
@@ -1072,7 +1081,6 @@ bool executeFunction(Memory* memory) {
         }
         if (!commandIsValid) {
             freeType(command);
-            initExecutiveToEnd(executive);
             freeMemory(executive);
             continue;
         }
@@ -1101,12 +1109,7 @@ bool executeFunction(Memory* memory) {
         freeType(U);
         freeType(command);
         freeResult(Universum);
-
-        executive->Type[executive->used]->row = malloc(sizeof(char) * 3);
-        executive->Type[executive->used]->str = malloc(sizeof(char*) * executive->Type[executive->used]->elements_used);
-        for (int j = 0; j < executive->Type[executive->used]->elements_used; j++) {
-            executive->Type[executive->used]->str[j] = malloc(sizeof(char) * MAX_SIZE);
-        }
+        initExecutiveToEnd(executive);
         freeMemory(executive);
     }
     free(str);
