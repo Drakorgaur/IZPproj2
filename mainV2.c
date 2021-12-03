@@ -110,12 +110,12 @@ void dump(type *Type, int* cursor) {
         } else {
             foreachElementInType {
                 printf("%s ", Type->str[i]);
-                printf("\n%s ", Type->str[i]);
-                printf("\n%s ", Type->str[i]);
             }
         }
     } else {
-        printf("%s", Type->str[0]);
+        printf("%s ", Type->str[0]);
+        printf("\n%s ", Type->str[0]);
+        printf("\n%s ", Type->str[0]);
     }
     *cursor = atoi(Type->row);
 }
