@@ -389,7 +389,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
     strcpy(wordBuffer, "");
     memory->used = -1;  //
     for (int wordSize = 0; !feof(file); wordSize++) {
-        if (row == 1000) {
+        if (row == 1001) {
             fprintf(stderr, "Failed: rows is more than 1000 %s\n", filename);
             fclose(file);
             free(wordBuffer);
