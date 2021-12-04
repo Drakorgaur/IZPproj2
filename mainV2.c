@@ -1672,6 +1672,11 @@ int main(int argc, char **argv) {
         freeMemory(memory);
         return 1;
     }
+    if (memory->used == 1) {
+        fprintf(stderr, "Only 1 line provided\n");
+        freeMemory(memory);
+        return 1;
+    }
     if (!checkForDuplicates(memory)) {
         freeMemory(memory);
         return 1;
