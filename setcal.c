@@ -387,7 +387,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
     wordBuffer = malloc(sizeof(char) * MAX_SIZE);
     strcpy(wordBuffer, "");
     memory->used = -1;  //
-    for (int wordSize = 0; !feof(file); wordSize++) {
+    for (int wordSize = 1; !feof(file); wordSize++) {
         if (row == 1001) {
             fprintf(stderr, "Failed: rows is more than 1000 %s\n", filename);
             fclose(file);
@@ -439,11 +439,11 @@ bool readFromFileV2(char* filename, Memory* memory) {
                  */
                 if (memory->Type[memory->used]->elements_used == memory->Type[memory->used]->elements_amount) //str[2][31] -> resize
                     resizeStr(memory->Type[memory->used]);
-                wordSize = 0;
+                wordSize = 1;
             }
             if (symbol == '\n') {
                 row++;
-                wordSize = 0;
+                wordSize = 1;
                 symbol = fgetc(file);
                 if (!headerChecker) {
                     if (universumCheck) {
@@ -511,7 +511,8 @@ bool readFromFileV2(char* filename, Memory* memory) {
                 strncat(wordBuffer, &symbol, 1);
             } else {
                 fprintf(stderr,"element %c on line %s has restricted symbol\n", memory->Type[memory->used]->header, memory->Type[memory->used]->row);
-                fclose(file); free(wordBuffer);
+                fclose(file);
+                free(wordBuffer);
                 return false;
             }
         } else {
@@ -525,8 +526,9 @@ bool readFromFileV2(char* filename, Memory* memory) {
         }
         headerChecker = false;
     }
+    free(wordBuffer);
     memory->used++;
-    fclose(file); free(wordBuffer);
+    fclose(file);
     return true;
 }
 
