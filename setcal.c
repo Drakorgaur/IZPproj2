@@ -870,6 +870,7 @@ void getUnique(type* A, char elements[][31], int* size, int start, int interval)
  * @param R (type-object)
  */
 char* reflexive(type* R) {
+    if (R->elements_used == 0) return "true";
     int size = 0;
     char elements[R->elements_used][31];
     strcpy(elements[size], R->str[0]);
@@ -947,8 +948,10 @@ char* antisymmetric(type* A) {
 char* transitive(type* R) {
     for (int i = 0; i < R->elements_used; i+=2) {
         bool transitive = false;
+        bool found = false;
         for (int j = 0; j < R->elements_used; j+=2) {
             if (strcmp(R->str[i+1], R->str[j]) == 0) {
+                found = true;
                 for (int k = 0; k < R->elements_used; k+=2) {
                     if (strcmp(R->str[k], R->str[i]) == 0 && k != i) {
                         if (strcmp(R->str[k+1], R->str[j+1]) == 0) {
@@ -959,7 +962,7 @@ char* transitive(type* R) {
                 }
             }
         }
-        if (!transitive) {
+        if (!transitive && found) {
             return "false";
         }
     }
