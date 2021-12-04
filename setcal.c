@@ -207,25 +207,24 @@ void dump(type *Type, int* cursor) {
         printf(" \n");
     }
     if (Type->header != 'F') {
-        printf("%c ", Type->header);
+        printf("%c", Type->header);
         if (Type->header == 'R') {
             for (int i = 0; i < Type->elements_used; i++) {
                 if (!(i % 2)) {
-                    printf("(");
-                    printf("%s ", Type->str[i]);
-                } else {
+                    printf(" (");
                     printf("%s", Type->str[i]);
-                    printf(") ");
+                } else {
+                    printf(" %s", Type->str[i]);
+                    printf(")");
                 }
             }
         } else {
-            //foreach Element in Type
             for (int i = 0; i < Type->elements_used; i++) {
-                printf("%s ", Type->str[i]);
+                    printf(" %s", Type->str[i]);
             }
         }
     } else {
-        printf("%s ", Type->str[0]);
+        printf("%s", Type->str[0]);
     }
     *cursor = atoi(Type->row);
 }
@@ -833,7 +832,7 @@ char* equals(type* A, type* B) {
 
 /*
  * -------------------RELATIONS-------------------
- */
+*/
 
 /**
  * method "getUnion" write to str unqie elements of
@@ -1518,6 +1517,7 @@ bool executeFunction(Memory* memory) {
     freeResult(commands);
     return true;
 }
+
 /**
  * "hasDuplicateRelation" method checks if the relation has duplicate
  * @param memory
