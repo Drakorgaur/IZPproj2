@@ -475,7 +475,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
         /**
          * check that word is less thatn 30
          */
-        if (wordSize == MAX_SIZE - 1) {
+        if (wordSize == MAX_SIZE) {
             fclose(file);
             free(wordBuffer);
             fprintf(stderr, "Error: element couldn't have size more than 30\n");
