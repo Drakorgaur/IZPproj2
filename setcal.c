@@ -1180,8 +1180,7 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
             selectByRow(memory, R, Temp->array[j]); // in R we have elements of R or S
             for (int d = 0; d < R->elements_used; d++) {
                 bool found = false;
-                for (int k = 0; k < Universum->elements_used; k++) {
-                    printf("%s %s\n", R->str[d], Universum->str[k]); //check for elements of R or S in Universum
+                for (int k = 0; k < Universum->elements_used; k++) {//check for elements of R or S in Universum
                     if (strcmp(R->str[d], Universum->str[k]) == 0) {
                         found = true;
                         break;
