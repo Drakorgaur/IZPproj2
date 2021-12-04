@@ -1191,7 +1191,6 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
                     freeResult(Temp);
                     freeType(R);
                     freeType(Universum);
-                    printf("----------------------------------------------------\n");
                     return false;
                 }
             }
@@ -1201,7 +1200,6 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     }
     freeResult(universum);
     freeType(Universum);
-    printf("----------------------------------------------------\n");
     return true;
 }
 
@@ -1634,7 +1632,6 @@ bool checkForDuplicates(Memory* memory) {
     }
     freeType(U);
     freeResult(universum);
-//------------------------------------------------------------------------------------------------------------------
     result* sets = createResult();
     selectByValue(memory, sets, 'S');
     for (int i = 0; i < sets->used; i++) {
