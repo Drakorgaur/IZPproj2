@@ -67,7 +67,7 @@ typedef struct {
  * Structure result is structure to save type-objects' rows
  *
  * This structure is support-structure for functions:
- *      selectByValue
+ *      Value
  *      selectByRow
  *
  * as in previous structures
@@ -1657,6 +1657,15 @@ bool checkForDuplicates(Memory* memory) {
     return true;
 }
 
+bool checkForLines(Memory* memory, char ch) {
+    for (int i = 0; i < memory->used; i++) {
+        if (memory->Type[i]->header == ch) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int main(int argc, char **argv) {
     (void)argc;
     if (argv[1] == NULL) {
@@ -1672,8 +1681,18 @@ int main(int argc, char **argv) {
         freeMemory(memory);
         return 1;
     }
-    if (memory->used == 1) {
-        fprintf(stderr, "Only 1 line provided\n");
+    if (memory->used <= 1) {
+        fprintf(stderr, "Too few line provided\n");
+        freeMemory(memory);
+        return 1;
+    }
+    if (!checkForLines(memory, 'U')) {
+        fprintf(stderr, "Universum not provided\n");
+        freeMemory(memory);
+        return 1;
+    }
+    if (!checkForLines(memory, 'C')) {
+        fprintf(stderr, "Command not provided\n");
         freeMemory(memory);
         return 1;
     }
