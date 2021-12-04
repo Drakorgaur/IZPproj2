@@ -2,24 +2,43 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * we create boolean type
+ */
 typedef unsigned short bool;
 #define true 1
 #define false 0
+
+/**
+ * we define DEFAULT_SIZE and MAX_SIZE
+ *      DEFAULT_SIZE is used to define the size of the array
+ *      MAX_SIZE is used to define (char*) element
+ */
 #define DEFAULT_SIZE 2
 #define MAX_SIZE 31
-#define forDefault for (int j = 0; j < DEFAULT_SIZE; j++)
-#define foreachElementInType for (int i = 0; i < Type->elements_used; i++)
-#define foreachResult for (int i = 0; i < commands->used; i++)
-#define SELECT_FROM_TYPES for (int i = 0; i < memory->used; i++) {
-#define WHERE for (int j = 0; j < TYPE[i]->elements_used; j++) {
-#define VALUE(a) if (TYPE[i]->header == (a)) {
-#define end }}}
-#define TYPE memory->Type
 
+/**
+ * Structure type is created to save lines.
+ * lines contains:
+ *      header(U/R/S/C)
+ *          --------------------------------------------------
+ *          U - universum
+ *          R - relation
+ *          S - set
+ *          C - command
+ *          --------------------------------------------------
+ *          E - empty/error
+ *          F - function
+ *          --------------------------------------------------
+ *      str -> elements(string).
+ *          str is 2D array to save strings as array
+ *      elements_amount -> amount of elements in str
+ *      elements_used   -> amount of used elements in str
+ *
+ *  elements_used is check if we need resize our str in struct.
+ *  we resize str if elements_used == elements_amount
+ */
 typedef struct {
-    /*
-     * TODO: nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false + patřit do univerza
-     */
     char header;
     char* row;
     char** str;
@@ -27,8 +46,16 @@ typedef struct {
     int elements_used;
 } type;
 
-/*
- * TODO: rename memory
+/**
+ * (**Type) - array of pointers to type objects
+ *
+ * Structure Memory is created to save all Types as array
+ * and check if we need resize our array of Types.
+ * to check it we have:
+ *      int size -> current size of array
+ *      int used -> current used elements in array
+ *
+ *  we resize **Type if used == size
  */
 typedef struct {
     type **Type;
@@ -36,17 +63,54 @@ typedef struct {
     int used;
 } Memory;
 
+/**
+ * Structure result is structure to save type-objects' rows
+ *
+ * This structure is support-structure for functions:
+ *      selectByValue
+ *      selectByRow
+ *
+ * as in previous structures
+ *      int size
+ *      int used
+ * help us to check if we need resize our array of rows.
+ */
 typedef struct {
     char** array;
     int size;
     int used;
 } result;
 
+/**
+ * "headerIsValid" method is checking if provided header is valid
+ * to write it in our type-object.
+ *
+ * @param header (char)
+ * @return
+ *      True if header is valid
+ *      False if header is not valid
+ */
 bool headerIsValid(char header) {
     if (header == 'U' || header == 'R' || header == 'C' || header == 'S') return true;
     return false;
 }
 
+/**
+ * "valueIsValid" method is checking if provided symbol is valid and
+ * if we can write it to our type-object.
+ *
+ * This function checks symbols for
+ *      Universum,
+ *      Sets,
+ *      Relation;
+ * ---NOT-FOR-----
+ *      Commands
+ *
+ * @param value (char)
+ * @return
+ *      True if symbol is valid
+ *      False if symbol is not valid
+ */
 bool valueIsValid(char value)
 {
     if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z')
@@ -54,6 +118,17 @@ bool valueIsValid(char value)
     return false;
 }
 
+/**
+ * "commandValueIsValid" method is checking if provided symbol is valid and
+ * we can write it to our type-object that contains command line.
+ *
+ * it used only for commands line
+ *
+ * @param value (char)
+ * @return
+ *      True if symbol is valid
+ *      False if symbol is not valid
+ */
 bool commandValueIsValid(char value)
 {
     if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9')
@@ -61,11 +136,31 @@ bool commandValueIsValid(char value)
     return false;
 }
 
+/**
+ * "typeIsValid" method is checking if provided type is right-created.
+ *
+ * Type that will be created in some of our methods would have header 'E'
+ *      heaeder 'E' is ERROR or EMPTY
+ *  Also we check if elements _used is less than zero to check if we have set elements_used
+ *
+ * @param A (type-object)
+ * @return
+ *      True if type is valid
+ *      False if type is not valid
+ */
 bool typeIsValid(type* A) {
     if (A->header == 'E' && A->elements_used <  0 ) return false;
     return true;
 }
 
+/**
+ * in "wordIsNotrestricted" method we check if provided word is not in array of restricted words
+ *
+ * @param word (char*) - to get string
+ * @return
+ *      True if word is not restricted
+ *      False if word is restricted
+ */
 bool wordIsNotrestricted(char* word) {
     char restricted[][31] = {"true", "false", "empty", "card", "complement", "union", "intersect", "minus",
                                "subseteq", "subset", "equals", "reflexive", "symmetric", "antisymmetric", "transitive",
@@ -78,11 +173,40 @@ bool wordIsNotrestricted(char* word) {
     return true;
 }
 
+/**
+ * "dump" method is print in provided by project-condition form.
+ *
+ * @param Type (type-object)
+ * @param cursor (int*)
+ *      cursor is int that have number of row of previous object
+ *      so if we have some empty lines in out .txt file
+ *      we could reproduce them in our output - STDOUT
+ *      (our first cycle)
+ *
+ * next condition checks of header is not F
+ *      F - function
+ * if it is NOT FUNCTION:
+ *      1) we print heaeder of our type-object Type;
+ *      2) we check if this line will be line of relation(R)
+ *          IF RELATION:
+ *          2.1.1) before each even elemnt we print '('
+ *          2.1.2) after each odd elemnt we print ') ' with space after to separate elements
+ *                   '(' and ')' were deleted by method checkAndRefactorRelations(read below)
+ *
+ *          IF NOT RELATION:
+ *          2.2.1) we print all elements of our type-object Type and separate them with space
+ * if it is FUNCTION:
+ *      1) we print our elements in str[0] separeted with space
+ *          this str[0] of our type-object Type resized to (MAX_LENGHT * (max(of elements_used))) to be able to obtain
+ *          all elements of our type-object(s)
+ *
+ *  pointer to cursor gets updated by value of this type-object Type's row
+ */
 void dump(type *Type, int* cursor) {
     for (int i = *cursor; i < atoi(Type->row); i++) {
         printf(" \n");
     }
-    if (Type->header != 'F') {  // C -> F
+    if (Type->header != 'F') {
         printf("%c ", Type->header);
         if (Type->header == 'R') {
             for (int i = 0; i < Type->elements_used; i++) {
@@ -95,7 +219,8 @@ void dump(type *Type, int* cursor) {
                 }
             }
         } else {
-            foreachElementInType {
+            //foreach Element in Type
+            for (int i = 0; i < Type->elements_used; i++) {
                 printf("%s ", Type->str[i]);
             }
         }
@@ -105,21 +230,45 @@ void dump(type *Type, int* cursor) {
     *cursor = atoi(Type->row);
 }
 
+/**
+ * "createRow" method allocates our row of type-object T
+ *      this method was created separately to check memory leaking by valgrind
+ *
+ * @param T (type-object)
+ */
 void createRow(type* T) {
     T->row = malloc(sizeof(char) * 3);
 }
+
+/**
+ * "createStr" method allocates our str-array of type-object T
+ *      we have to allocate memory for our str-array
+ *          and then
+ *      we have to allocate memory for each element of our str-array
+ *
+ *      this method was created separately to check memory leaking by valgrind
+ *
+ * @param T (type-object)
+ */
 void createStr(type* T) {
-    T->str = malloc(sizeof(char*) * DEFAULT_SIZE);
+    T->str = malloc(sizeof(char*) * T->elements_amount);
     for (int i = 0; i < DEFAULT_SIZE; i++) {
         T->str[i] = malloc(sizeof(char) * MAX_SIZE);
     }
 }
 
+/**
+ *  "copyType" method provides ability to copy data from our type-object oldType to our type-object newType
+ *
+ *      To use this method we have only allocate memory for our type-object newType and provide it to this method
+ * @param newType (type-object)
+ * @param oldType (type-object)
+ */
 void copyType(type* newType, type* oldType) {
     newType->header = oldType->header;
     newType->elements_amount = oldType->elements_used;
     newType->elements_used = oldType->elements_used;
-    newType->row = malloc(sizeof(char) * 3);
+    createRow(newType);
     strcpy(newType->row, oldType->row);
     newType->str = malloc(sizeof(char*) * newType->elements_used);
     for (int i = 0; i < newType->elements_used; i++) {
@@ -128,15 +277,34 @@ void copyType(type* newType, type* oldType) {
     }
 }
 
-//create new type
+/**
+ * "createType" is method that creates our type-object T
+ *
+ * @param T (type-object)
+ *
+ *      we set header of object as 'N' what means NONE/NULL
+ *          so we know that object is empty
+ *      as standart was choosen to create array [2][31] so we set T->elements_amount to DEFAULT_SIZE
+ *      and call createStr method to create it with chosen T->elements_amount param
+ */
 void createType(type* T) {
-    T->header = 'N'; //NONE or NULL
+    T->header = 'N';
+    T->elements_amount = DEFAULT_SIZE;
     createRow(T);
     createStr(T);
-    T->elements_amount = DEFAULT_SIZE;
     T->elements_used = 0;
 }
 
+/**
+ * "initTypeArray" method creates our type-object array and return it
+ *      as standart was choosen to create 2D-arrays as [2][x] so we allocate
+ *      **Type with DEFAULT_SIZE
+ *
+ * this method is used only for createMemory method, because only memory-object must have
+ * 2D-array of type-objects
+ *
+ * @return 2D-Type array
+ */
 type** initTypeArray() {
     type** Type = malloc(sizeof(type*) * DEFAULT_SIZE);
     for (int i = 0; i < DEFAULT_SIZE; i++) {
@@ -146,6 +314,12 @@ type** initTypeArray() {
     return Type;
 }
 
+/**
+ * "createMemory" method creates our memory-object
+ *      as standart was choosen to create 2D-arrays as [2][x] so we set Memory-object size to DEFAULT_SIZE
+ *
+ * @return memory-object
+ */
 Memory* createMemory() {
     Memory* memory = malloc(sizeof(Memory));
     memory->Type = initTypeArray();
@@ -154,6 +328,15 @@ Memory* createMemory() {
     return memory;
 }
 
+/**
+ * "resizeMemory" method re-allocate memory for our memory-object
+ *      we increase our memory-object size by 1
+ *      and increase our memory-object Type-array size by this increment
+ *          then we have to allocate memory for our new Type-object
+ *          and then we create empty type-object
+ *
+ * @param memory (memory-object)
+ */
 void resizeMemory(Memory* memory) {
     memory->size++;
     memory->Type = realloc(memory->Type, sizeof(type*) * memory->size);
@@ -161,19 +344,45 @@ void resizeMemory(Memory* memory) {
     createType(memory->Type[memory->used]);
 }
 
+/**
+ * "resizeStr" method re-allocate memory for our str-array of type-object T
+ *      we realloc our str-array by 1
+ *      initialize new element of str-array with malloc
+ *          and increase our elements_size by 1
+ * @param T (type-object)
+ */
 void resizeStr(type* T) {
     T->str = realloc(T->str, sizeof(char*) * (T->elements_amount + 1));
     T->str[T->elements_amount] = malloc(sizeof(char) * MAX_SIZE);
     T->elements_amount++;
 }
 
+/**
+ * "readFromFileV2" method reads file, checks input and write data to our type-objects in memory-object
+ *      we provide file name that we had to get as program argument
+ *      we checks if file is empty
+ *
+ * variables:
+ *      int row                number of row in file
+ *      char symbol            symbol that we read from file
+ *      char* wordBuffer       buffer that contains word from file, NOT a symbol
+ *      bool headerChecker     check if we wait for header from input, that gains true if we have new line
+ *      bool universumCheck    check if we now write in unviersum to prevent writing restricted words
+ *
+ *      we use
+ *          memory->used = -1; because we had to check if line would be empty at start or we would have empty spaces
+ *          after word was copied from buffer to type-object we clear byffer by method strcpy with ""
+ * @param filename
+ * @param memory
+ * @return
+ */
 bool readFromFileV2(char* filename, Memory* memory) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         fprintf(stderr, "Failed: to open file %s\n", filename);
         return false;
     }
-    int row  = 1;
+    int row = 1;
     bool headerChecker = true, universumCheck = false;
     char symbol, *wordBuffer;
     wordBuffer = malloc(sizeof(char) * MAX_SIZE);
@@ -182,12 +391,25 @@ bool readFromFileV2(char* filename, Memory* memory) {
     for (int wordSize = 0; !feof(file); wordSize++) {
         symbol = fgetc(file);
         while (symbol == ' ' || symbol == '\n') {
+            /**
+             * this condition skips spaces
+             */
             if (symbol == ' ') {
                 if (headerChecker) {
+                    /**
+                     * we skip spaces if we waiting for header
+                     */
+                    if (memory->used == -1) {
+                        symbol = fgetc(file);
+                        continue;
+                    }
                     symbol = fgetc(file);
                     headerChecker = false;
                     continue;
                 }
+                /**
+                 * if we write in universum we have to check if we do not write restricted words
+                 */
                 if (universumCheck) {
                     if (!wordIsNotrestricted(wordBuffer)) {
                         fprintf(stderr, "Universum has restricted word");
@@ -196,11 +418,20 @@ bool readFromFileV2(char* filename, Memory* memory) {
                         return false;
                     }
                 }
+                /**
+                 * we copy word from buffer to type-object
+                 */
                 strcpy(memory->Type[memory->used]->str[memory->Type[memory->used]->elements_used], wordBuffer);
                 if (strcmp(wordBuffer, "") != 0) {
                     memory->Type[memory->used]->elements_used++;
                 }
+                /**
+                 * we clear buffer by method strcpy with ""
+                 */
                 strcpy(wordBuffer, "");
+                /**
+                 * we resize memory if needed
+                 */
                 if (memory->Type[memory->used]->elements_used == memory->Type[memory->used]->elements_amount) //str[2][31] -> resize
                     resizeStr(memory->Type[memory->used]);
                 wordSize = 0;
@@ -211,6 +442,10 @@ bool readFromFileV2(char* filename, Memory* memory) {
                 symbol = fgetc(file);
                 if (!headerChecker) {
                     if (universumCheck) {
+                        /**
+                         * we need to write our word in buffer to our type-object on previous line
+                         * so we check to this wasn't universum and we write our word
+                         */
                         if (!wordIsNotrestricted(wordBuffer)) {
                             fprintf(stderr, "Universum has restricted word");
                             fclose(file);
@@ -231,6 +466,9 @@ bool readFromFileV2(char* filename, Memory* memory) {
             }
             symbol = fgetc(file);
         }
+        /**
+         * check that word is less thatn 30
+         */
         if (wordSize == MAX_SIZE - 1) {
             fclose(file);
             free(wordBuffer);
@@ -239,6 +477,9 @@ bool readFromFileV2(char* filename, Memory* memory) {
         }
         if (headerChecker) {
             if (headerIsValid(symbol)) {
+                /**
+                 * we set header and resize memory if needed
+                 */
                 if (++memory->used == memory->size) resizeMemory(memory);
                 memory->Type[memory->used]->header = symbol;
                 if (memory->Type[memory->used]->header == 'U') {
@@ -256,6 +497,10 @@ bool readFromFileV2(char* filename, Memory* memory) {
                 return false;
             }
         }
+        /**
+         * here we check that what type of line we gonna get to check
+         *      if needed write '(' and ')'
+         */
         if (memory->Type[memory->used]->header == 'C') {
             if (commandValueIsValid(symbol)) {
                 strncat(wordBuffer, &symbol, 1);
@@ -280,6 +525,11 @@ bool readFromFileV2(char* filename, Memory* memory) {
     return true;
 }
 
+/**
+ * we free memory allocated for Type-object
+ *
+ * @param Type(type-object)
+ */
 void freeType(type* Type) {
     for (int i = 0; i < Type->elements_amount; i++) {
         free(Type->str[i]);
@@ -289,6 +539,11 @@ void freeType(type* Type) {
     free(Type);
 }
 
+/**
+ * we free memory allocated for memory-object
+ *
+ * @param memory (memory-object)
+ */
 void freeMemory(Memory* memory) {
     for (int i = 0; i < memory->size; i++) {
         freeType(memory->Type[i]);
@@ -297,27 +552,51 @@ void freeMemory(Memory* memory) {
     free(memory);
 }
 
+/**
+ * we free memory allocated for result-object
+ *
+ * @param res (result-object)
+ */
 void freeResult(result* res) {
     for (int i = 0; i < res->size; i++) free(res->array[i]);
     free(res->array);
     free(res);
 }
 
+/**
+ * "createResult" method creates result-object with standard size array[2][x]
+ *
+ * @return result-object
+ */
 result* createResult() {
     result* res = malloc(sizeof(result));
     res->size = DEFAULT_SIZE;
     res->used = 0;
     res->array = malloc(sizeof(char*) * DEFAULT_SIZE);
-    forDefault res->array[j] = malloc(sizeof(char) * MAX_SIZE);
+    for (int j = 0; j < DEFAULT_SIZE; j++) res->array[j] = malloc(sizeof(char) * MAX_SIZE);
     return res;
 }
 
+/**
+ * "resizeResult" method resizes result-object by 1
+ *
+ * @param res (result-object)
+ */
 void resizeResult(result* res) {
     res->size++;
     res->array = realloc(res->array, sizeof(char*) * res->size);
     res->array[res->used] = malloc(sizeof(char) * MAX_SIZE);
 }
 
+/**
+ * "selectByValue" works like "select" method from SQL language
+ *      we provide to this method:
+ *          @param Memory-object that contains all our data with type-objects
+ *          @param result-object that we will fill with our data
+ *          @param ch that contains what header we should search for
+ *
+ *      when we find type-object with header that we need we copy it row to our result-object
+ */
 void selectByValue(Memory* memory, result* res, char ch) {
     for (int i = 0; i < memory->used; i++) {
         if (memory->Type[i]->header == ch) {
@@ -327,6 +606,15 @@ void selectByValue(Memory* memory, result* res, char ch) {
     }
 }
 
+/**
+ * "selectByValue" method works like "select" method from SQL language
+ *      we provide to this method:
+ *          @param Memory-object that contains all our data with type-objects
+ *          @param type-object that we will fill with our data by copyType method
+ *          @param line that contains Type-object that we want to copy
+ *
+ * if we trying to copy N-header object we had to initialize our newType-object
+ */
 void selectByRow(Memory* memory, type* newType, char* line) {
     bool found = false;
     for (int i = 0; i < memory->used; i++) {
@@ -335,7 +623,7 @@ void selectByRow(Memory* memory, type* newType, char* line) {
             if (memory->Type[i]->elements_used >= 0) {
                 copyType(newType, memory->Type[i]);
             } else {
-                newType->header = memory->Type[i]->header; // NONE
+                newType->header = memory->Type[i]->header;
                 newType->elements_amount = DEFAULT_SIZE;
                 newType->str = malloc(sizeof(char*) * newType->elements_amount);
                 for (int j = 0; j < newType->elements_amount; j++) {
@@ -355,15 +643,31 @@ void selectByRow(Memory* memory, type* newType, char* line) {
     }
 }
 
+/**
+ * @param A (type-object)
+ * @return
+ *      TRUE if set A is empty
+ *      FALSE if set A is not
+ */
 char* empty(type* A) {
     if (A->elements_used == 0) return "true";
     return "false";
 }
 
+/**
+ * @param A (type-object)
+ * @return number of elements in set A
+ */
 int card(type* A) {
     return A->elements_used;
 }
 
+/**
+ * "method complement" copy to str elements that are not in set A but in Universum
+ * @param A (type-object)
+ * @param U (type-object)
+ * @param str
+ */
 void complement(type* A, type* U, char* str) {
     strcpy(str, "S ");
     if (A->header == 'U') {
@@ -384,8 +688,12 @@ void complement(type* A, type* U, char* str) {
     }
 }
 
-/*
- * TODO: test
+/**
+ * "union_" method write to str elements that are in set A or in set B
+ *
+ * @param A (type-object)
+ * @param B (type-object)
+ * @param str
  */
 void union_(type* A, type* B, char* str) {
     strcpy(str, "S ");
@@ -408,8 +716,12 @@ void union_(type* A, type* B, char* str) {
     }
 }
 
-/*
- * TODO: test
+/**
+ * "intersect" method write to str elements that are in set A and in set B
+ *
+ * @param A (type-object)
+ * @param B (type-object)
+ * @param str
  */
 void intersect(type* A, type* B, char* str) {
     strcpy(str, "S ");
@@ -423,8 +735,13 @@ void intersect(type* A, type* B, char* str) {
         }
     }
 }
-/*
- * TODO: test
+
+/**
+ * "minus" method write to str elements that are in set A and are not in set B
+ *
+ * @param A (type-object)
+ * @param B (type-object)
+ * @param str
  */
 void minus(type* A, type* B, char* str) {
     strcpy(str, "S ");
@@ -443,8 +760,12 @@ void minus(type* A, type* B, char* str) {
     }
 }
 
-/*
- * TODO: test
+/**
+ * "subseteq" method checks if set A is subseteq of set B
+ *
+ * @param A (type-object)
+ * @param B (type-object)
+ * @param str
  */
 char* subseteq(type* A, type* B) {
     for (int i = 0; i < A->elements_used; i++) {
@@ -460,8 +781,12 @@ char* subseteq(type* A, type* B) {
     return "true";
 }
 
-/*
- * TODO: test
+/**
+ * "subset" method checks if set A is subset of set B
+ *
+ * @param A (type-object)
+ * @param B (type-object)
+ * @param str
  */
 char* subset(type* A, type* B) {
     if (A->elements_used == B->elements_used) return "false";
@@ -478,8 +803,12 @@ char* subset(type* A, type* B) {
     return "true";
 }
 
-/*
- * TODO: test
+/**
+ * "equals" method checks if set A is equal to set B
+ *
+ * @param A (type-object)
+ * @param B (type-object)
+ * @param str
  */
 char* equals(type* A, type* B) {
     if (A->elements_used != B->elements_used) return "false";
@@ -500,6 +829,14 @@ char* equals(type* A, type* B) {
  * -------------------RELATIONS-------------------
  */
 
+/**
+ * method "getUnion" write to str unqie elements of
+ * @param A
+ * @param elements
+ * @param size
+ * @param start
+ * @param interval
+ */
 void getUnique(type* A, char elements[][31], int* size, int start, int interval) {
     for (int i = start; i < A->elements_used; i+=interval) {
         bool found = false;
@@ -518,8 +855,11 @@ void getUnique(type* A, char elements[][31], int* size, int start, int interval)
         }
     }
 }
-/*
- * TODO: DONE/test - test j < size to j < size + 1;
+
+/**
+ * "reflexive" method checks if relation R is reflexive
+ *
+ * @param R (type-object)
  */
 char* reflexive(type* R) {
     int size = 0;
@@ -544,8 +884,10 @@ char* reflexive(type* R) {
     return "true";
 }
 
-/*
- * TODO: test
+/**
+ * "symmetric" method checks if relation R is symmetric
+ *
+ * @param R (type-object)
  */
 char* symmetric(type* A) {
     for (int i = 0; i < A->elements_used; i+=2) {
@@ -568,8 +910,10 @@ char* symmetric(type* A) {
     return "true";
 }
 
-/*
- * TODO: test
+/**
+ * "antisymmetric" method checks if relation R is antisymmetric
+ *
+ * @param R (type-object)
  */
 char* antisymmetric(type* A) {
     for (int i = 0; i < A->elements_used; i+=2) {
@@ -587,8 +931,10 @@ char* antisymmetric(type* A) {
     return "true";
 }
 
-/*
- * TODO: NOT DONE - NEED TO CHECK AND TEST
+/**
+ * "transitive" method checks if relation R is transitive
+ *
+ * @param R (type-object)
  */
 char* transitive(type* R) {
     for (int i = 0; i < R->elements_used; i+=2) {
@@ -612,8 +958,10 @@ char* transitive(type* R) {
     return "true";
 }
 
-/*
- * TODO: test
+/**
+ * "function" method checks if relation R is function
+ *
+ * @param R (type-object)
  */
 char* function(type* A) {
     for (int i = 0; i < A->elements_used; i+=2) {
@@ -627,12 +975,10 @@ char* function(type* A) {
     return "true";
 }
 
-/*
- * TODO: DONE/test
+/**
+ * "domain" write domain of relation R
  *
- * TODO: create error message
- *
- * TODO: test isFunction
+ * @param R (type-object)
  */
 void domain(type* R, char* str) {
     strcpy(str, "S ");
@@ -648,8 +994,10 @@ void domain(type* R, char* str) {
     }
 }
 
-/*
- * TODO: test isFunction
+/**
+ * "codomain" write codomain of relation R
+ *
+ * @param R (type-object)
  */
 void codomain(type* R, char* str) {
     strcpy(str, "S ");
@@ -665,13 +1013,12 @@ void codomain(type* R, char* str) {
     }
 }
 
-/*
- * TODO: test
+/**
+ * "injective" method checks if relation R is injective for given sets
+ *
+ * @param R (type-object)
  */
 char* injective(type* R, type* A, type* B) {
-    /*
-     * TODO: create a helper
-     */
     int sizeA = 0, sizeB = 0;
     char elementsA[A->elements_used][31], elementsB[B->elements_used][31];
     strcpy(elementsA[sizeA], A->str[0]);
@@ -724,16 +1071,15 @@ char* injective(type* R, type* A, type* B) {
     return "true";
 }
 
-/*
- * TODO: test
+/**
+ * "surjective" method checks if relation R is injective for given sets
+ *
+ * @param R (type-object)
  */
 char* surjective(type* R, type* A, type* B) {
     if (B->header != 'S') {
         return "false";
     }
-    /*
-     * TODO: create a helper
-     */
     int sizeA = 0;
     char elementsA[A->elements_used][31];
     strcpy(elementsA[sizeA], A->str[0]);
@@ -757,13 +1103,12 @@ char* surjective(type* R, type* A, type* B) {
     return "true";
 }
 
-/*
- * TODO: test
+/**
+ * "bijective" method checks if relation R is injective for given sets
+ *
+ * @param R (type-object)
  */
 char* bijective(type* R, type* A, type* B) {
-    /*
-     * TODO: create a helper
-     */
     int sizeA = 0;
     int sizeB = 0;
     char elementsA[A->elements_used][31];
@@ -805,6 +1150,15 @@ char* bijective(type* R, type* A, type* B) {
     return "true";
 }
 
+/**
+ * "checkForRelationAndSetElementsInUniversum" method checks if relations and sets are correct and contains only
+ * elements present in universum
+ *
+ * @param memory (Memory-object)
+ * @return
+ *      True if all relations and sets are correct and contains only elements present in universum
+ *      False if one of relations or sets is incorrect or contains elements not present in universum
+ */
 bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     char array[DEFAULT_SIZE] = {'R', 'S'};
     result* universum = createResult();
@@ -842,15 +1196,40 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     return true;
 }
 
+/**
+ * checks if provided type-object has not providedheader
+ * @param A (type-object)
+ * @param header
+ * @return
+ *      True if type-object has not provided header
+ *      False if type-object has provided header
+ */
 bool headerIsNotEqual(type* A, char header) {
     if (A->header == header) return false;
     return true;
 }
 
+/**
+ * "callFunctionByItName" method calls function by given in C lines function-names
+ *      we provide variables:
+ *          @param name  - name of function
+ *          @param executors - memory-object that has all types that was provided in C lines
+ *          @param U    - universum
+ *          @param str - string that is used as buffer to get response from function and provide it to types that
+ *                  lays in Memory-object memory in main(currently in execution function)
+ *
+ *      than we separated function by amount of arguments they use:
+ *          1 arguement - empty, card...
+ *          2 arguements - union, intersect...
+ *          3 arguements - injective, bijective, surjective.
+ *              in case we didnt find function we return error that not right amount of arguments were provided
+ * @return
+ */
 bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     if (executors->used == 1) {
         if (strcmp(name, "empty") == 0) {
-            if (headerIsNotEqual(executors->Type[0], 'S') && headerIsNotEqual(executors->Type[0], 'U')) {
+            if (headerIsNotEqual(executors->Type[0], 'S')
+            && headerIsNotEqual(executors->Type[0], 'U')) {
                 fprintf(stderr, "Error: empty() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -858,7 +1237,8 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
             strcpy(str, empty(executors->Type[0])); return true;
         }
         if (strcmp(name, "card") == 0) {
-            if (headerIsNotEqual(executors->Type[0], 'S') && headerIsNotEqual(executors->Type[0], 'U')) {
+            if (headerIsNotEqual(executors->Type[0], 'S')
+            && headerIsNotEqual(executors->Type[0], 'U')) {
                 fprintf(stderr, "Error: card() can be used only with sets\n");
                 strcpy(str, "FAIL\n");
                 return false;
@@ -1019,6 +1399,11 @@ bool callFunctionByItName(char* name, Memory* executors, type* U, char* str) {
     return false;
 }
 
+/**
+ * "getMaxLength" returns the length of the longest string in the array of type-objects
+ * @param memory
+ * @return
+ */
 int getMaxLength(Memory* memory) {
     int max = 0;
     for (int i = 0; i < memory->used; i++) {
@@ -1029,6 +1414,13 @@ int getMaxLength(Memory* memory) {
     return max;
 }
 
+/**
+ * "initExecutiveToEnd" initializes the executive to the end
+ *      method was created because in use of the "executors" variable we had to copy our elements
+ *      and as standard we have array[2][x] but ininialized only first element
+ *      so to free our memory we had to allocate it to the end
+ * @param executive (Memory-object)
+ */
 void initExecutiveToEnd(Memory* executive) {
     executive->Type[executive->used]->row = malloc(sizeof(char) * 3);
     executive->Type[executive->used]->str = malloc(sizeof(char*) * executive->Type[executive->used]->elements_used);
@@ -1037,12 +1429,20 @@ void initExecutiveToEnd(Memory* executive) {
     }
 }
 
+/**
+ * "executeFunction" method gets all C-lines and executes them by getting and providing
+ *      types and function name to the "callFunctionByItName" method
+ * @param memory (Memory-object)
+ * @return
+ *      True if all lines were executed successfully
+ *      False if some line was not executed successfully
+ */
 bool executeFunction(Memory* memory) {
     int size = getMaxLength(memory);
     result* commands = createResult();
     selectByValue(memory, commands, 'C');
     char* str = malloc(sizeof(char) * (size * MAX_SIZE));
-    foreachResult {
+    for (int i = 0; i < commands->used; i++) {
         Memory* executive = malloc(sizeof(Memory));
         executive->size = DEFAULT_SIZE;
         executive->Type = malloc(sizeof(type*) * executive->size);
@@ -1112,7 +1512,13 @@ bool executeFunction(Memory* memory) {
     freeResult(commands);
     return true;
 }
-
+/**
+ * "hasDuplicateRelation" method checks if the relation has duplicate
+ * @param memory
+ * @return
+ *      True if the relation has no duplicate
+ *      False if the relation has duplicate
+ */
 bool hasDuplicateRelation(Memory* memory) {
     result * relations = createResult();
     selectByValue(memory, relations, 'R');
@@ -1140,6 +1546,14 @@ bool hasDuplicateRelation(Memory* memory) {
     return true;
 }
 
+/**
+ * "checkAndRefactorRelations" method check if relation have right amount of elements and refactor them:
+ *      method deleted '(' and ')' so we can use them in the future
+ * @param memory
+ * @return
+ *      True if the relation has no duplicate
+ *      False if the relation has duplicate
+ */
 bool checkAndRefactorRelations(Memory* memory) {
     for (int i = 0; i < memory->used; i++) {
         if (memory->Type[i]->header == 'R') {
@@ -1153,9 +1567,6 @@ bool checkAndRefactorRelations(Memory* memory) {
                 char* p = strstr(memory->Type[i]->str[j], str);
                 char* p2 = strstr(memory->Type[i]->str[j], str2);
                 if (!(j % 2) && p != NULL) {
-                    /*
-                     * TODO: fix overlapping
-                     */
                     p++;
                     strcpy(memory->Type[i]->str[j], p);
                     continue;
@@ -1178,6 +1589,14 @@ bool checkAndRefactorRelations(Memory* memory) {
     return true;
 }
 
+/**
+ * check for duplicate in the all objects in our Memory-object
+ *
+ * @param memory
+ * @return
+ *      True if type-object has no duplicate
+ *      False if type-object has duplicate
+ */
 bool checkForDuplicates(Memory* memory) {
     result* universum = createResult();
     selectByValue(memory, universum, 'U');

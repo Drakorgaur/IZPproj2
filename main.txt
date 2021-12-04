@@ -1,3 +1,8 @@
-U
-R
-C domain 2
+
+
+U a b c
+S a
+
+
+C empty 3
+
