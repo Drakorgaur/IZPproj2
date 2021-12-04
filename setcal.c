@@ -838,7 +838,7 @@ char* equals(type* A, type* B) {
 */
 
 /**
- * method "getUnion" write to str unqie elements of
+ * method "getUnique" write to str unqie elements of relation
  * @param A
  * @param elements
  * @param size
@@ -1089,6 +1089,12 @@ char* injective(type* R, type* A, type* B) {
  */
 char* surjective(type* R, type* A, type* B) {
     if (B->header != 'S') {
+        return "false";
+    }
+    if (A->elements_used == 0) {
+        return "false";
+    }
+    if (B->elements_used == 0) {
         return "false";
     }
     int sizeA = 0;
