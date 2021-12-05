@@ -240,6 +240,7 @@ void createRow(type* T) {
     if (T->row == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(T->row);
         return;
     }
 }
@@ -259,6 +260,7 @@ void createStr(type* T) {
     if (T->str == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(T->str);
         return;
     }
     for (int i = 0; i < DEFAULT_SIZE; i++) {
@@ -266,6 +268,7 @@ void createStr(type* T) {
         if (T->str[i] == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(T->row);
             return;
         }
     }
@@ -288,6 +291,7 @@ void copyType(type* newType, type* oldType) {
     if (newType->row == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(newType->row);
         return;
     }
     for (int i = 0; i < newType->elements_used; i++) {
@@ -295,6 +299,7 @@ void copyType(type* newType, type* oldType) {
         if (newType->row == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(newType->row);
             return;
         }
         strcpy(newType->str[i], oldType->str[i]);
@@ -334,6 +339,7 @@ type** initTypeArray() {
     if (Type == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(Type);
         return 0;
     }
     for (int i = 0; i < DEFAULT_SIZE; i++) {
@@ -341,6 +347,7 @@ type** initTypeArray() {
         if (Type[i] == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(Type[i]);
             return 0;
         }
         createType(Type[i]);
@@ -359,6 +366,7 @@ Memory* createMemory() {
     if (memory == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(memory);
         return 0;
     }
     memory->Type = initTypeArray();
@@ -382,12 +390,14 @@ void resizeMemory(Memory* memory) {
     if (memory->Type == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(memory->Type);
         return;
     }
     memory->Type[memory->used] = malloc(sizeof(type));
     if (memory->Type[memory->used] == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(memory->Type[memory->used]);
         return;
     }
     createType(memory->Type[memory->used]);
@@ -405,12 +415,14 @@ void resizeStr(type* T) {
     if (T->str == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(T->str);
         return;
     }
     T->str[T->elements_amount] = malloc(sizeof(char) * MAX_SIZE);
     if (T->str[T->elements_amount] == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(T->str[T->elements_amount]);
         return;
     }
     T->elements_amount++;
@@ -448,6 +460,7 @@ bool readFromFileV2(char* filename, Memory* memory) {
     if (wordBuffer == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(wordBuffer);
         return 0;
     }
     strcpy(wordBuffer, "");
@@ -646,6 +659,7 @@ result* createResult() {
     if (res == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(res);
         return 0;
     }
     res->size = DEFAULT_SIZE;
@@ -654,11 +668,7 @@ result* createResult() {
     if (res->array == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
-        return 0;
-    }
-    if (res->array == NULL)
-    {
-        fprintf(stderr, "Failed: to allocate memory");
+        free(res->array);
         return 0;
     }
     for (int j = 0; j < DEFAULT_SIZE; j++) {
@@ -666,10 +676,10 @@ result* createResult() {
             if (res->array[j] == NULL)
             {
                 fprintf(stderr, "Failed: to allocate memory");
+                free(res->array[j]);
                 return 0;
             }
     }
-
     return res;
 }
 
@@ -684,12 +694,14 @@ void resizeResult(result* res) {
     if (res->array == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(res->array);
         return;
     }
     res->array[res->used] = malloc(sizeof(char) * MAX_SIZE);
     if (res->array[res->used] == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(res->array[res->used]);
         return;
     }
 }
@@ -735,6 +747,7 @@ void selectByRow(Memory* memory, type* newType, char* line) {
                 if (newType->str == NULL)
                 {
                     fprintf(stderr, "Failed: to allocate memory");
+                    free(newType->str);
                     return;
                 }
                 for (int j = 0; j < newType->elements_amount; j++) {
@@ -742,6 +755,7 @@ void selectByRow(Memory* memory, type* newType, char* line) {
                         if (newType->str[j] == NULL)
                         {
                             fprintf(stderr, "Failed: to allocate memory");
+                            free(newType->str[j]);
                             return;
                         }
                 }
@@ -749,6 +763,7 @@ void selectByRow(Memory* memory, type* newType, char* line) {
                 if (newType->row == NULL)
                 {
                     fprintf(stderr, "Failed: to allocate memory");
+                    free(newType->row);
                     return;
                 }
             }
@@ -760,6 +775,7 @@ void selectByRow(Memory* memory, type* newType, char* line) {
         if (newType->str == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(newType->str);
             return;
         }
         for (int j = 0; j < newType->elements_amount; j++) {
@@ -767,6 +783,7 @@ void selectByRow(Memory* memory, type* newType, char* line) {
                 if (newType->str[j] == NULL)
                 {
                     fprintf(stderr, "Failed: to allocate memory");
+                    free(newType->str[j]);
                     return;
                 }
         }
@@ -774,6 +791,7 @@ void selectByRow(Memory* memory, type* newType, char* line) {
         if (newType->row == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(newType->row);
             return;
         }
     }
@@ -1306,6 +1324,7 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
     if (Universum == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(Universum);
         return 0;
     }
     selectByRow(memory, Universum, universum->array[universum->used - 1]); //in Universum we have elements of U
@@ -1317,6 +1336,7 @@ bool checkForRelationAndSetElementsInUniversum(Memory *memory) {
             if (R == NULL)
             {
                 fprintf(stderr, "Failed: to allocate memory");
+                free(R);
                 return 0;
             }
             selectByRow(memory, R, Temp->array[j]); // in R we have elements of R or S
@@ -1575,12 +1595,14 @@ void initExecutiveToEnd(Memory* executive) {
     if (executive->Type == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(executive->Type);
         return;
     }
     executive->Type[executive->used]->str = malloc(sizeof(char*) * executive->Type[executive->used]->elements_used);
     if (executive->Type[executive->used]->str == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(executive->Type[executive->used]->str);
         return;
     }
     for (int j = 0; j < executive->Type[executive->used]->elements_used; j++) {
@@ -1588,6 +1610,7 @@ void initExecutiveToEnd(Memory* executive) {
             if (executive->Type[executive->used]->str[j] == NULL)
             {
                 fprintf(stderr, "Failed: to allocate memory");
+                free(executive->Type[executive->used]->str[j]);
                 return;
             }
     }
@@ -1609,6 +1632,7 @@ bool executeFunction(Memory* memory) {
     if (str == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(str);
         return 0;
     }
     for (int i = 0; i < commands->used; i++) {
@@ -1616,12 +1640,25 @@ bool executeFunction(Memory* memory) {
         if (executive == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(executive);
             return 0;
         }
         executive->size = DEFAULT_SIZE;
         executive->Type = malloc(sizeof(type*) * executive->size);
+        if (executive->Type == NULL)
+        {
+            fprintf(stderr, "Failed: to allocate memory");
+            free(executive->Type);
+            return 0;
+        }
         for (int j = 0; j < executive->size; j++) {
             executive->Type[j] = malloc(sizeof(type));
+            if (executive->Type[j] == NULL)
+            {
+                fprintf(stderr, "Failed: to allocate memory");
+                free(executive->Type[j]);
+                return 0;
+            }
         }
         executive->used = 0;
 
@@ -1629,6 +1666,7 @@ bool executeFunction(Memory* memory) {
         if (command == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(command);
             return 0;
         }
         selectByRow(memory, command, commands->array[i]);
@@ -1637,6 +1675,7 @@ bool executeFunction(Memory* memory) {
             if (Type == NULL)
             {
                 fprintf(stderr, "Failed: to allocate memory");
+                free(Type);
                 return 0;
             }
             Type->header = 'E';
@@ -1663,12 +1702,14 @@ bool executeFunction(Memory* memory) {
                 if (executive->Type == NULL)
                 {
                     fprintf(stderr, "Failed: to allocate memory");
+                    free(executive->Type);
                     return 0;
                 }
                 executive->Type[executive->used] = malloc(sizeof(type));
                 if (executive->Type[executive->used] == NULL)
                 {
                     fprintf(stderr, "Failed: to allocate memory");
+                    free(executive->Type[executive->used]);
                     return 0;
                 }
             }
@@ -1680,6 +1721,7 @@ bool executeFunction(Memory* memory) {
         if (U == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(U);
             return 0;
         }
         selectByRow(memory, U, Universum->array[0]);
@@ -1700,6 +1742,7 @@ bool executeFunction(Memory* memory) {
                     if (memory->Type[j]->str[k] == NULL)
                     {
                         fprintf(stderr, "Failed: to allocate memory");
+                        free(memory->Type[j]->str[k]);
                         return 0;
                     }
                 }
@@ -1732,6 +1775,7 @@ bool hasDuplicateRelation(Memory* memory) {
         if (relation == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(relation);
             return 0;
         }
         selectByRow(memory, relation, relations->array[i]);
@@ -1819,6 +1863,7 @@ bool checkForDuplicates(Memory* memory) {
     if (U == NULL)
     {
         fprintf(stderr, "Failed: to allocate memory");
+        free(U);
         return 0;
     }
     selectByRow(memory, U, universum->array[0]);
@@ -1846,6 +1891,7 @@ bool checkForDuplicates(Memory* memory) {
         if (set == NULL)
         {
             fprintf(stderr, "Failed: to allocate memory");
+            free(set);
             return 0;
         }
         selectByRow(memory, set, sets->array[i]);
